@@ -55,6 +55,11 @@ public class GlobalExceptionHandler {
                 .body(new ValidationErrorResponse("VALIDATION_ERROR", "Validation failed", fieldErrors));
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    ResponseEntity<ApiErrorResponse> illegalArgument(IllegalArgumentException ex) {
+        return response(HttpStatus.BAD_REQUEST, "INVALID_REQUEST", ex.getMessage());
+    }
+
     @ExceptionHandler(AccessDeniedException.class)
     ResponseEntity<ApiErrorResponse> accessDenied(AccessDeniedException ex) {
         return response(HttpStatus.FORBIDDEN, "ACCESS_DENIED", ex.getMessage());

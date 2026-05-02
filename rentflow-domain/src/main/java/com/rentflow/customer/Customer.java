@@ -13,28 +13,40 @@ public final class Customer extends AggregateRoot {
     private final String firstName;
     private final String lastName;
     private final String email;
+    private final String phone;
     private CustomerStatus status;
     private String blacklistReason;
 
-    private Customer(CustomerId id, String firstName, String lastName, String email, CustomerStatus status,
+    private Customer(CustomerId id, String firstName, String lastName, String email, String phone, CustomerStatus status,
                      String blacklistReason) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+        this.phone = phone;
         this.status = status;
         this.blacklistReason = blacklistReason;
     }
 
     public static Customer create(CustomerId id, String firstName, String lastName, String email) {
+        return create(id, firstName, lastName, email, null);
+    }
+
+    public static Customer create(CustomerId id, String firstName, String lastName, String email, String phone) {
         return new Customer(
                 Objects.requireNonNull(id),
                 Objects.requireNonNull(firstName),
                 Objects.requireNonNull(lastName),
                 Objects.requireNonNull(email),
+                phone,
                 CustomerStatus.ACTIVE,
                 null
         );
+    }
+
+    public static Customer reconstitute(CustomerId id, String firstName, String lastName, String email, String phone,
+                                        CustomerStatus status, String blacklistReason) {
+        return new Customer(id, firstName, lastName, email, phone, status, blacklistReason);
     }
 
     public boolean isBlacklisted() {
@@ -71,6 +83,10 @@ public final class Customer extends AggregateRoot {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getPhone() {
+        return phone;
     }
 
     public CustomerStatus getStatus() {

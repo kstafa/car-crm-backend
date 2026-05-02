@@ -4,6 +4,8 @@ import com.rentflow.shared.DomainException;
 import com.rentflow.shared.id.VehicleCategoryId;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class VehicleTest {
@@ -104,6 +106,40 @@ class VehicleTest {
         vehicle.markAsRented();
 
         assertThrows(DomainException.class, vehicle::deactivate);
+    }
+
+    @Test
+    void addPhoto_validKey_appendsToList() {
+        Vehicle vehicle = vehicle();
+
+        vehicle.addPhoto("vehicles/a.jpg");
+
+        assertEquals(List.of("vehicles/a.jpg"), vehicle.getPhotoKeys());
+    }
+
+    @Test
+    void addPhoto_blankKey_throwsDomainException() {
+        Vehicle vehicle = vehicle();
+
+        assertThrows(DomainException.class, () -> vehicle.addPhoto(" "));
+    }
+
+    @Test
+    void removePhoto_existingKey_removesFromList() {
+        Vehicle vehicle = vehicle();
+        vehicle.addPhoto("vehicles/a.jpg");
+
+        vehicle.removePhoto("vehicles/a.jpg");
+
+        assertTrue(vehicle.getPhotoKeys().isEmpty());
+    }
+
+    @Test
+    void removePhoto_unknownKey_noOpNoException() {
+        Vehicle vehicle = vehicle();
+
+        assertDoesNotThrow(() -> vehicle.removePhoto("missing.jpg"));
+        assertTrue(vehicle.getPhotoKeys().isEmpty());
     }
 
     private static Vehicle vehicle() {

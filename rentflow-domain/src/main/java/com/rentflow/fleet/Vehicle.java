@@ -5,6 +5,9 @@ import com.rentflow.shared.DomainException;
 import com.rentflow.shared.id.VehicleCategoryId;
 import com.rentflow.shared.id.VehicleId;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 public final class Vehicle extends AggregateRoot {
@@ -18,9 +21,12 @@ public final class Vehicle extends AggregateRoot {
     private int currentMileage;
     private VehicleStatus status;
     private boolean active;
+    private final String description;
+    private final List<String> photoKeys;
 
     private Vehicle(VehicleId id, String licensePlate, String brand, String model, int year,
-                    VehicleCategoryId categoryId, int currentMileage, VehicleStatus status, boolean active) {
+                    VehicleCategoryId categoryId, int currentMileage, VehicleStatus status, boolean active,
+                    String description, List<String> photoKeys) {
         this.id = id;
         this.licensePlate = licensePlate;
         this.brand = brand;
@@ -30,10 +36,17 @@ public final class Vehicle extends AggregateRoot {
         this.currentMileage = currentMileage;
         this.status = status;
         this.active = active;
+        this.description = description;
+        this.photoKeys = new ArrayList<>(Objects.requireNonNull(photoKeys));
     }
 
     public static Vehicle register(String licensePlate, String brand, String model, int year,
                                    VehicleCategoryId categoryId, int initialMileage) {
+        return register(licensePlate, brand, model, year, categoryId, initialMileage, null);
+    }
+
+    public static Vehicle register(String licensePlate, String brand, String model, int year,
+                                   VehicleCategoryId categoryId, int initialMileage, String description) {
         Vehicle vehicle = new Vehicle(
                 VehicleId.generate(),
                 Objects.requireNonNull(licensePlate),
@@ -43,10 +56,19 @@ public final class Vehicle extends AggregateRoot {
                 Objects.requireNonNull(categoryId),
                 initialMileage,
                 VehicleStatus.AVAILABLE,
-                true
+                true,
+                description,
+                List.of()
         );
         vehicle.registerEvent(new VehicleRegisteredEvent(vehicle.id));
         return vehicle;
+    }
+
+    public static Vehicle reconstitute(VehicleId id, String licensePlate, String brand, String model, int year,
+                                       VehicleCategoryId categoryId, int currentMileage, VehicleStatus status,
+                                       boolean active, String description, List<String> photoKeys) {
+        return new Vehicle(id, licensePlate, brand, model, year, categoryId, currentMileage, status, active,
+                description, photoKeys == null ? List.of() : photoKeys);
     }
 
     public void markAsRented() {
@@ -84,6 +106,24 @@ public final class Vehicle extends AggregateRoot {
         registerEvent(new VehicleDeactivatedEvent(id));
     }
 
+    public void putOutOfService() {
+        if (status == VehicleStatus.RENTED) {
+            throw new DomainException("Rented vehicle cannot be put out of service");
+        }
+        status = VehicleStatus.OUT_OF_SERVICE;
+    }
+
+    public void addPhoto(String key) {
+        if (key == null || key.isBlank()) {
+            throw new DomainException("photo key must not be blank");
+        }
+        photoKeys.add(key);
+    }
+
+    public void removePhoto(String key) {
+        photoKeys.remove(key);
+    }
+
     public VehicleId getId() {
         return id;
     }
@@ -118,5 +158,13 @@ public final class Vehicle extends AggregateRoot {
 
     public boolean isActive() {
         return active;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public List<String> getPhotoKeys() {
+        return Collections.unmodifiableList(photoKeys);
     }
 }

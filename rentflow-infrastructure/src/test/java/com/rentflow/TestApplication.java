@@ -1,7 +1,7 @@
 package com.rentflow;
 
-import org.springframework.boot.SpringBootConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootConfiguration
+@SpringBootApplication(scanBasePackages = "com.rentflow")
 class TestApplication {
 }

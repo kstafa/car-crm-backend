@@ -31,10 +31,11 @@ public final class Reservation extends AggregateRoot {
     private final Money depositAmount;
     private final Money taxAmount;
     private final List<ReservationExtra> extras;
+    private final String notes;
 
     private Reservation(ReservationId id, String reservationNumber, CustomerId customerId, VehicleId vehicleId,
                         DateRange rentalPeriod, ReservationStatus status, Money baseAmount, Money discountAmount,
-                        Money depositAmount, Money taxAmount, List<ReservationExtra> extras) {
+                        Money depositAmount, Money taxAmount, List<ReservationExtra> extras, String notes) {
         this.id = id;
         this.reservationNumber = reservationNumber;
         this.customerId = customerId;
@@ -46,6 +47,7 @@ public final class Reservation extends AggregateRoot {
         this.depositAmount = depositAmount;
         this.taxAmount = taxAmount;
         this.extras = extras;
+        this.notes = notes;
     }
 
     public static Reservation create(CustomerId customerId, VehicleId vehicleId, DateRange rentalPeriod,
@@ -67,8 +69,17 @@ public final class Reservation extends AggregateRoot {
                 Money.zero(baseAmount.currency()),
                 depositAmount,
                 taxAmount,
-                new ArrayList<>()
+                new ArrayList<>(),
+                null
         );
+    }
+
+    public static Reservation reconstitute(ReservationId id, String reservationNumber, CustomerId customerId,
+                                           VehicleId vehicleId, DateRange rentalPeriod, ReservationStatus status,
+                                           Money baseAmount, Money discountAmount, Money depositAmount,
+                                           Money taxAmount, List<ReservationExtra> extras, String notes) {
+        return new Reservation(id, reservationNumber, customerId, vehicleId, rentalPeriod, status, baseAmount,
+                discountAmount, depositAmount, taxAmount, new ArrayList<>(extras), notes);
     }
 
     public void confirm() {
@@ -172,6 +183,10 @@ public final class Reservation extends AggregateRoot {
 
     public List<ReservationExtra> getExtras() {
         return Collections.unmodifiableList(extras);
+    }
+
+    public String getNotes() {
+        return notes;
     }
 
     private static String randomReservationSuffix() {

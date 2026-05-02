@@ -1,49 +1,47 @@
 package com.rentflow.security;
 
-import com.rentflow.shared.id.StaffId;
-import com.rentflow.staff.Permission;
+import com.rentflow.staff.adapter.out.persistence.JpaStaffDetailsService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 @RestController
 @RequestMapping("/api/v1/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
-    private static final String ADMIN_EMAIL = "admin@rentflow.com";
-    private static final String ADMIN_PASSWORD = "changeme";
-    private static final StaffId ADMIN_STAFF_ID = StaffId.of("00000000-0000-0000-0000-000000000001");
-
+    private final JpaStaffDetailsService staffDetailsService;
     private final JwtTokenService jwtTokenService;
-
-    public AuthController(JwtTokenService jwtTokenService) {
-        this.jwtTokenService = jwtTokenService;
-    }
+    private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
-    public ResponseEntity<TokenResponse> login(@Valid @RequestBody LoginRequest request) {
-        if (!ADMIN_EMAIL.equals(request.email()) || !ADMIN_PASSWORD.equals(request.password())) {
-            return ResponseEntity.status(401).build();
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+        UserDetails userDetails;
+        try {
+            userDetails = staffDetailsService.loadUserByUsername(request.email());
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        Set<String> permissions = Arrays.stream(Permission.values())
-                .map(Enum::name)
-                .collect(Collectors.toUnmodifiableSet());
-        StaffPrincipal principal = new StaffPrincipal(ADMIN_STAFF_ID, ADMIN_EMAIL, "ADMIN", permissions);
-        return ResponseEntity.ok(new TokenResponse(jwtTokenService.generateAccessToken(principal),
-                "static-refresh-token"));
+        if (!passwordEncoder.matches(request.password(), userDetails.getPassword())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        StaffPrincipal principal = (StaffPrincipal) userDetails;
+        return ResponseEntity.ok(new LoginResponse(jwtTokenService.generateAccessToken(principal),
+                "refresh-token-placeholder"));
     }
 
     public record LoginRequest(@NotBlank String email, @NotBlank String password) {
     }
 
-    public record TokenResponse(String accessToken, String refreshToken) {
+    public record LoginResponse(String accessToken, String refreshToken) {
     }
 }
