@@ -1,10 +1,12 @@
 package com.rentflow.shared;
 
+import com.rentflow.contract.DamageReportId;
 import com.rentflow.shared.id.ReservationId;
 import com.rentflow.shared.id.StaffId;
 import com.rentflow.shared.id.VehicleCategoryId;
 import com.rentflow.shared.id.VehicleId;
 import com.rentflow.shared.id.CustomerId;
+import com.rentflow.shared.id.ContractId;
 
 import java.time.Instant;
 
@@ -23,6 +25,14 @@ public record AuditEntry(String actionType, String entityType, String entityId, 
 
     public static AuditEntry of(String actionType, CustomerId id, StaffId actor) {
         return of(actionType, "Customer", id.value().toString(), actor);
+    }
+
+    public static AuditEntry of(String actionType, ContractId id, StaffId actor) {
+        return of(actionType, "Contract", id.value().toString(), actor);
+    }
+
+    public static AuditEntry of(String actionType, DamageReportId id, StaffId actor) {
+        return of(actionType, "DamageReport", id.value().toString(), actor);
     }
 
     private static AuditEntry of(String actionType, String entityType, String entityId, StaffId actor) {

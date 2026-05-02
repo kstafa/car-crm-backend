@@ -20,6 +20,10 @@ rentflow:
   jwt:
     secret: "change-me-in-production-min-32-chars-long"
     access-token-expiry-ms: 900000
+  storage:
+    enabled: false
+    bucket: rentflow-assets
+    base-url: ""
 
 server:
   port: 8080

@@ -1,6 +1,6 @@
 package com.rentflow.reservation;
 
-import com.rentflow.fleet.FuelLevel;
+import com.rentflow.shared.FuelLevel;
 import com.rentflow.shared.money.Money;
 import org.junit.jupiter.api.Test;
 

@@ -2,6 +2,7 @@ package com.rentflow.fleet.adapter.in.rest;
 
 import com.rentflow.fleet.VehicleStatus;
 import com.rentflow.fleet.command.UpdateVehicleStatusCommand;
+import com.rentflow.fleet.command.UploadVehiclePhotoCommand;
 import com.rentflow.fleet.model.AvailableVehicle;
 import com.rentflow.fleet.model.CategorySummary;
 import com.rentflow.fleet.model.VehicleSummary;
@@ -12,6 +13,7 @@ import com.rentflow.fleet.port.in.ListCategoriesUseCase;
 import com.rentflow.fleet.port.in.ListVehiclesUseCase;
 import com.rentflow.fleet.port.in.RegisterVehicleUseCase;
 import com.rentflow.fleet.port.in.UpdateVehicleStatusUseCase;
+import com.rentflow.fleet.port.in.UploadVehiclePhotoUseCase;
 import com.rentflow.fleet.query.ListVehiclesQuery;
 import com.rentflow.security.StaffPrincipal;
 import com.rentflow.shared.id.StaffId;
@@ -33,11 +35,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.http.MediaType;
 
 @RestController
 @RequestMapping("/api/v1/fleet")
@@ -51,6 +56,7 @@ public class FleetController {
     private final FindAvailableVehiclesUseCase findAvailable;
     private final CreateCategoryUseCase createCategory;
     private final ListCategoriesUseCase listCategories;
+    private final UploadVehiclePhotoUseCase uploadVehiclePhoto;
     private final FleetMapper mapper;
 
     @GetMapping("/vehicles")
@@ -98,6 +104,16 @@ public class FleetController {
         updateVehicleStatus.update(new UpdateVehicleStatusCommand(VehicleId.of(id), VehicleStatus.OUT_OF_SERVICE,
                 staffId(authentication)));
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping(value = "/vehicles/{id}/photos", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAuthority('FLEET_EDIT')")
+    public ResponseEntity<PhotoUploadResponse> uploadVehiclePhoto(@PathVariable("id") UUID id,
+                                                                  @RequestParam("file") MultipartFile file,
+                                                                  Authentication authentication) throws IOException {
+        String key = uploadVehiclePhoto.upload(new UploadVehiclePhotoCommand(VehicleId.of(id), file.getBytes(),
+                file.getOriginalFilename(), file.getContentType(), staffId(authentication)));
+        return ResponseEntity.ok(new PhotoUploadResponse(key));
     }
 
     @GetMapping("/availability")

@@ -7,6 +7,7 @@ import com.rentflow.fleet.VehicleStatus;
 import com.rentflow.fleet.command.CreateCategoryCommand;
 import com.rentflow.fleet.command.RegisterVehicleCommand;
 import com.rentflow.fleet.command.UpdateVehicleStatusCommand;
+import com.rentflow.fleet.command.UploadVehiclePhotoCommand;
 import com.rentflow.fleet.model.AvailableVehicle;
 import com.rentflow.fleet.model.VehicleDetail;
 import com.rentflow.fleet.port.out.VehicleCategoryRepository;
@@ -23,6 +24,7 @@ import com.rentflow.shared.id.VehicleId;
 import com.rentflow.shared.money.Money;
 import com.rentflow.shared.port.out.AuditLogPort;
 import com.rentflow.shared.port.out.DomainEventPublisher;
+import com.rentflow.shared.port.out.FileStoragePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -60,6 +62,8 @@ class FleetApplicationServiceTest {
     private DomainEventPublisher eventPublisher;
     @Mock
     private AuditLogPort auditLogPort;
+    @Mock
+    private FileStoragePort fileStoragePort;
 
     private FleetApplicationService service;
     private VehicleCategoryId categoryId;
@@ -68,7 +72,7 @@ class FleetApplicationServiceTest {
     @BeforeEach
     void setUp() {
         service = new FleetApplicationService(vehicleRepository, categoryRepository, availabilityPort, cachePort,
-                eventPublisher, auditLogPort);
+                eventPublisher, auditLogPort, fileStoragePort);
         categoryId = VehicleCategoryId.generate();
         staffId = StaffId.generate();
     }
@@ -245,6 +249,30 @@ class FleetApplicationServiceTest {
 
         assertThrows(DomainException.class, () -> service.create(createCategoryCommand()));
         verify(categoryRepository, never()).save(any());
+    }
+
+    @Test
+    void uploadVehiclePhoto_validFile_uploadsAndAddsKeyToVehicle() {
+        Vehicle vehicle = vehicle();
+        when(vehicleRepository.findById(vehicle.getId())).thenReturn(Optional.of(vehicle));
+        when(fileStoragePort.upload(any(), eq("vehicles/" + vehicle.getId().value() + "/photos"), any(),
+                eq("image/jpeg"))).thenReturn("vehicles/" + vehicle.getId().value() + "/photos/a.jpg");
+
+        String key = service.upload(new UploadVehiclePhotoCommand(vehicle.getId(), new byte[]{1}, "a.jpg",
+                "image/jpeg", staffId));
+
+        assertEquals("vehicles/" + vehicle.getId().value() + "/photos/a.jpg", key);
+        assertEquals(List.of(key), vehicle.getPhotoKeys());
+        verify(vehicleRepository).save(vehicle);
+    }
+
+    @Test
+    void uploadVehiclePhoto_vehicleNotFound_throwsResourceNotFoundException() {
+        VehicleId vehicleId = VehicleId.generate();
+        when(vehicleRepository.findById(vehicleId)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> service.upload(new UploadVehiclePhotoCommand(vehicleId,
+                new byte[]{1}, "a.jpg", "image/jpeg", staffId)));
     }
 
     private RegisterVehicleCommand registerCommand() {

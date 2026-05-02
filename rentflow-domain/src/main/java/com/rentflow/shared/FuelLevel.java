@@ -1,4 +1,4 @@
-package com.rentflow.fleet;
+package com.rentflow.shared;
 
 public enum FuelLevel {
     EMPTY(0),

@@ -13,6 +13,7 @@ import com.rentflow.fleet.port.in.ListCategoriesUseCase;
 import com.rentflow.fleet.port.in.ListVehiclesUseCase;
 import com.rentflow.fleet.port.in.RegisterVehicleUseCase;
 import com.rentflow.fleet.port.in.UpdateVehicleStatusUseCase;
+import com.rentflow.fleet.port.in.UploadVehiclePhotoUseCase;
 import com.rentflow.fleet.query.FindAvailableVehiclesQuery;
 import com.rentflow.security.JwtAuthFilter;
 import com.rentflow.security.JwtTokenService;
@@ -79,6 +80,8 @@ class FleetControllerTest {
     private CreateCategoryUseCase createCategory;
     @MockBean
     private ListCategoriesUseCase listCategories;
+    @MockBean
+    private UploadVehiclePhotoUseCase uploadVehiclePhoto;
     @MockBean
     private FleetMapper mapper;
 

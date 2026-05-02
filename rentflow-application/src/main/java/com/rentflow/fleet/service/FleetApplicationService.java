@@ -5,6 +5,7 @@ import com.rentflow.fleet.VehicleCategory;
 import com.rentflow.fleet.command.CreateCategoryCommand;
 import com.rentflow.fleet.command.RegisterVehicleCommand;
 import com.rentflow.fleet.command.UpdateVehicleStatusCommand;
+import com.rentflow.fleet.command.UploadVehiclePhotoCommand;
 import com.rentflow.fleet.model.AvailableVehicle;
 import com.rentflow.fleet.model.CategorySummary;
 import com.rentflow.fleet.model.VehicleDetail;
@@ -16,6 +17,7 @@ import com.rentflow.fleet.port.in.ListCategoriesUseCase;
 import com.rentflow.fleet.port.in.ListVehiclesUseCase;
 import com.rentflow.fleet.port.in.RegisterVehicleUseCase;
 import com.rentflow.fleet.port.in.UpdateVehicleStatusUseCase;
+import com.rentflow.fleet.port.in.UploadVehiclePhotoUseCase;
 import com.rentflow.fleet.port.out.VehicleCategoryRepository;
 import com.rentflow.fleet.port.out.VehicleRepository;
 import com.rentflow.fleet.query.FindAvailableVehiclesQuery;
@@ -31,6 +33,7 @@ import com.rentflow.shared.id.VehicleCategoryId;
 import com.rentflow.shared.id.VehicleId;
 import com.rentflow.shared.port.out.AuditLogPort;
 import com.rentflow.shared.port.out.DomainEventPublisher;
+import com.rentflow.shared.port.out.FileStoragePort;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,12 +41,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 @Transactional
 public class FleetApplicationService implements RegisterVehicleUseCase, UpdateVehicleStatusUseCase,
         GetVehicleUseCase, ListVehiclesUseCase, FindAvailableVehiclesUseCase, CreateCategoryUseCase,
-        ListCategoriesUseCase {
+        ListCategoriesUseCase, UploadVehiclePhotoUseCase {
 
     private final VehicleRepository vehicleRepository;
     private final VehicleCategoryRepository categoryRepository;
@@ -51,16 +55,19 @@ public class FleetApplicationService implements RegisterVehicleUseCase, UpdateVe
     private final AvailabilityCachePort cachePort;
     private final DomainEventPublisher eventPublisher;
     private final AuditLogPort auditLogPort;
+    private final FileStoragePort fileStoragePort;
 
     public FleetApplicationService(VehicleRepository vehicleRepository, VehicleCategoryRepository categoryRepository,
                                    VehicleAvailabilityPort availabilityPort, AvailabilityCachePort cachePort,
-                                   DomainEventPublisher eventPublisher, AuditLogPort auditLogPort) {
+                                   DomainEventPublisher eventPublisher, AuditLogPort auditLogPort,
+                                   FileStoragePort fileStoragePort) {
         this.vehicleRepository = vehicleRepository;
         this.categoryRepository = categoryRepository;
         this.availabilityPort = availabilityPort;
         this.cachePort = cachePort;
         this.eventPublisher = eventPublisher;
         this.auditLogPort = auditLogPort;
+        this.fileStoragePort = fileStoragePort;
     }
 
     @Override
@@ -148,6 +155,19 @@ public class FleetApplicationService implements RegisterVehicleUseCase, UpdateVe
         return categoryRepository.findAllActive();
     }
 
+    @Override
+    public String upload(UploadVehiclePhotoCommand cmd) {
+        Vehicle vehicle = vehicleRepository.findById(cmd.vehicleId())
+                .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found: " + cmd.vehicleId().value()));
+        String filename = UUID.randomUUID() + extension(cmd.originalFilename());
+        String key = fileStoragePort.upload(cmd.fileBytes(), "vehicles/" + cmd.vehicleId().value() + "/photos",
+                filename, cmd.contentType());
+        vehicle.addPhoto(key);
+        vehicleRepository.save(vehicle);
+        auditLogPort.log(AuditEntry.of("VEHICLE_PHOTO_UPLOADED", vehicle.getId(), cmd.uploadedBy()));
+        return key;
+    }
+
     private List<VehicleId> findAndCacheAvailableIds(VehicleCategoryId categoryId, DateRange period) {
         List<Vehicle> activeVehicles = vehicleRepository.findActiveByCategoryId(categoryId);
         Set<VehicleId> conflictingIds = new HashSet<>(availabilityPort.findConflictingVehicleIds(categoryId, period));
@@ -189,5 +209,10 @@ public class FleetApplicationService implements RegisterVehicleUseCase, UpdateVe
 
     private void publishEvents(List<DomainEvent> events) {
         events.forEach(eventPublisher::publish);
+    }
+
+    private static String extension(String filename) {
+        int index = filename == null ? -1 : filename.lastIndexOf('.');
+        return index < 0 ? "" : filename.substring(index);
     }
 }
