@@ -2,6 +2,9 @@ package com.rentflow.reservation.service;
 
 import com.rentflow.customer.Customer;
 import com.rentflow.customer.port.out.CustomerRepository;
+import com.rentflow.fleet.Vehicle;
+import com.rentflow.fleet.VehicleCategory;
+import com.rentflow.fleet.port.out.VehicleCategoryRepository;
 import com.rentflow.fleet.port.out.VehicleRepository;
 import com.rentflow.reservation.DateRange;
 import com.rentflow.reservation.Reservation;
@@ -45,8 +48,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.util.Currency;
 import java.util.Comparator;
 import java.util.List;
 
@@ -57,12 +58,11 @@ public class ReservationApplicationService implements CreateReservationUseCase, 
         ListReservationsUseCase, GetReservationCalendarUseCase, GetReservationConflictsUseCase,
         ListTodayPickupsUseCase, ListTodayReturnsUseCase, ListOverdueUseCase {
 
-    private static final Currency EUR = Currency.getInstance("EUR");
-
     private final ReservationRepository reservationRepository;
     private final VehicleAvailabilityPort vehicleAvailabilityPort;
     private final AvailabilityCachePort availabilityCachePort;
     private final VehicleRepository vehicleRepository;
+    private final VehicleCategoryRepository categoryRepository;
     private final CustomerRepository customerRepository;
     private final DomainEventPublisher eventPublisher;
     private final AuditLogPort auditLogPort;
@@ -72,6 +72,7 @@ public class ReservationApplicationService implements CreateReservationUseCase, 
                                          VehicleAvailabilityPort vehicleAvailabilityPort,
                                          AvailabilityCachePort availabilityCachePort,
                                          VehicleRepository vehicleRepository,
+                                         VehicleCategoryRepository categoryRepository,
                                          CustomerRepository customerRepository,
                                          DomainEventPublisher eventPublisher,
                                          AuditLogPort auditLogPort) {
@@ -79,6 +80,7 @@ public class ReservationApplicationService implements CreateReservationUseCase, 
         this.vehicleAvailabilityPort = vehicleAvailabilityPort;
         this.availabilityCachePort = availabilityCachePort;
         this.vehicleRepository = vehicleRepository;
+        this.categoryRepository = categoryRepository;
         this.customerRepository = customerRepository;
         this.eventPublisher = eventPublisher;
         this.auditLogPort = auditLogPort;
@@ -88,17 +90,21 @@ public class ReservationApplicationService implements CreateReservationUseCase, 
     public ReservationId create(CreateReservationCommand cmd) {
         Customer customer = customerRepository.findById(cmd.customerId())
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found: " + cmd.customerId().value()));
-        vehicleRepository.findById(cmd.vehicleId())
+        Vehicle vehicle = vehicleRepository.findById(cmd.vehicleId())
                 .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found: " + cmd.vehicleId().value()));
         if (customer.isBlacklisted()) {
             throw new BlacklistedCustomerException(cmd.customerId());
         }
+        VehicleCategory category = categoryRepository.findById(vehicle.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("Vehicle category not found: "
+                        + vehicle.getCategoryId().value()));
 
         DateRange period = new DateRange(cmd.pickupDatetime(), cmd.returnDatetime());
-        Money dailyRate = new Money(new BigDecimal("100.00"), EUR);
+        Money dailyRate = category.getBaseDailyRate();
         Money baseAmount = pricingService.calculateBaseAmount(dailyRate, period);
+        Money taxAmount = baseAmount.multiply(category.getTaxRate());
         Reservation reservation = Reservation.create(cmd.customerId(), cmd.vehicleId(), period, baseAmount,
-                Money.zero(EUR), Money.zero(EUR));
+                category.getDepositAmount(), taxAmount);
 
         reservationRepository.save(reservation);
         publishEvents(reservation);

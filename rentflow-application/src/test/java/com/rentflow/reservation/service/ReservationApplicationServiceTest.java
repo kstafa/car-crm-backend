@@ -3,6 +3,8 @@ package com.rentflow.reservation.service;
 import com.rentflow.customer.Customer;
 import com.rentflow.customer.port.out.CustomerRepository;
 import com.rentflow.fleet.Vehicle;
+import com.rentflow.fleet.VehicleCategory;
+import com.rentflow.fleet.port.out.VehicleCategoryRepository;
 import com.rentflow.fleet.port.out.VehicleRepository;
 import com.rentflow.reservation.DateRange;
 import com.rentflow.reservation.Reservation;
@@ -68,6 +70,8 @@ class ReservationApplicationServiceTest {
     @Mock
     private VehicleRepository vehicleRepository;
     @Mock
+    private VehicleCategoryRepository categoryRepository;
+    @Mock
     private CustomerRepository customerRepository;
     @Mock
     private DomainEventPublisher eventPublisher;
@@ -86,6 +90,7 @@ class ReservationApplicationServiceTest {
                 vehicleAvailabilityPort,
                 availabilityCachePort,
                 vehicleRepository,
+                categoryRepository,
                 customerRepository,
                 eventPublisher,
                 auditLogPort
@@ -98,7 +103,7 @@ class ReservationApplicationServiceTest {
     @Test
     void create_allValid_savesAndPublishesEventAndAudits() {
         stubCustomer(Customer.create(customerId, "Ada", "Lovelace", "ada@example.com"));
-        stubVehicle(vehicle());
+        stubBillableVehicle();
         CreateReservationCommand command = createCommand();
 
         ReservationId id = service.create(command);
@@ -107,6 +112,8 @@ class ReservationApplicationServiceTest {
         verify(reservationRepository).save(captor.capture());
         assertEquals(id, captor.getValue().getId());
         assertEquals(ReservationStatus.DRAFT, captor.getValue().getStatus());
+        assertTrue(captor.getValue().getDepositAmount().equals(money("300.00")));
+        assertTrue(captor.getValue().getTaxAmount().equals(money("60.00")));
         verify(auditLogPort).log(any());
         verify(eventPublisher, never()).publish(any());
         verify(vehicleAvailabilityPort, never()).isAvailable(any(), any());
@@ -146,7 +153,7 @@ class ReservationApplicationServiceTest {
     @Test
     void create_vehicleUnavailable_savesDraftWithoutCheckingAvailability() {
         stubCustomer(Customer.create(customerId, "Ada", "Lovelace", "ada@example.com"));
-        stubVehicle(vehicle());
+        stubBillableVehicle();
 
         service.create(createCommand());
 
@@ -158,7 +165,7 @@ class ReservationApplicationServiceTest {
     @Test
     void create_validParams_doesNotInvalidateAvailabilityCache() {
         stubCustomer(Customer.create(customerId, "Ada", "Lovelace", "ada@example.com"));
-        stubVehicle(vehicle());
+        stubBillableVehicle();
 
         service.create(createCommand());
 
@@ -436,6 +443,17 @@ class ReservationApplicationServiceTest {
 
     private Vehicle vehicle() {
         return Vehicle.register("AA-123-AA", "Toyota", "Yaris", 2024, VehicleCategoryId.generate(), 1000);
+    }
+
+    private void stubBillableVehicle() {
+        Vehicle vehicle = vehicle();
+        stubVehicle(vehicle);
+        when(categoryRepository.findById(vehicle.getCategoryId())).thenReturn(Optional.of(category(vehicle.getCategoryId())));
+    }
+
+    private VehicleCategory category(VehicleCategoryId id) {
+        return VehicleCategory.reconstitute(id, "Economy", "Economy category", money("100.00"),
+                money("300.00"), new BigDecimal("0.20"), true);
     }
 
     private void stubCustomer(Customer customer) {

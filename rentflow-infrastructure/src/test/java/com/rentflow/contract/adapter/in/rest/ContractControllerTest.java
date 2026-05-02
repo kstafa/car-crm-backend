@@ -26,6 +26,7 @@ import com.rentflow.shared.ResourceNotFoundException;
 import com.rentflow.shared.VehicleNotAvailableException;
 import com.rentflow.shared.id.ContractId;
 import com.rentflow.shared.id.CustomerId;
+import com.rentflow.shared.id.InvoiceId;
 import com.rentflow.shared.id.ReservationId;
 import com.rentflow.shared.id.VehicleId;
 import com.rentflow.shared.money.Money;
@@ -239,7 +240,7 @@ class ContractControllerTest {
     @WithMockUser(authorities = "CONTRACT_CLOSE")
     void recordReturn_noDamage_returns200WithZeroSurcharges() throws Exception {
         ReturnSummary summary = new ReturnSummary(ContractId.generate(), false, null, money("0.00"), money("0.00"),
-                money("0.00"));
+                money("0.00"), InvoiceId.generate());
         when(mapper.toCommand(any(), any(RecordReturnRequest.class), any())).thenReturn(returnCommand());
         when(recordReturn.recordReturn(any())).thenReturn(summary);
         when(mapper.toResponse(summary)).thenReturn(returnResponse(summary, null));
@@ -257,7 +258,7 @@ class ContractControllerTest {
     void recordReturn_withDamage_returns200WithDamageFlag() throws Exception {
         DamageReportId reportId = DamageReportId.generate();
         ReturnSummary summary = new ReturnSummary(ContractId.generate(), true, reportId, money("0.00"), money("0.00"),
-                money("0.00"));
+                money("0.00"), InvoiceId.generate());
         when(mapper.toCommand(any(), any(RecordReturnRequest.class), any())).thenReturn(returnCommand());
         when(recordReturn.recordReturn(any())).thenReturn(summary);
         when(mapper.toResponse(summary)).thenReturn(returnResponse(summary, reportId.value()));
@@ -349,7 +350,7 @@ class ContractControllerTest {
     private static ReturnSummaryResponse returnResponse(ReturnSummary summary, UUID reportId) {
         return new ReturnSummaryResponse(summary.contractId().value(), summary.damageDetected(), reportId,
                 summary.lateFee().amount(), summary.fuelSurcharge().amount(), summary.totalSurcharges().amount(),
-                "EUR");
+                "EUR", summary.invoiceId().value());
     }
 
     private static RecordReturnCommand returnCommand() {

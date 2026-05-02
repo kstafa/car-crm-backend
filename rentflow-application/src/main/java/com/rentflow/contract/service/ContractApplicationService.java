@@ -42,6 +42,8 @@ import com.rentflow.reservation.port.out.ReservationRepository;
 import com.rentflow.reservation.port.out.VehicleAvailabilityPort;
 import com.rentflow.contract.query.ListContractsQuery;
 import com.rentflow.contract.query.ListDamageReportsQuery;
+import com.rentflow.payment.command.CreateInvoiceForContractCommand;
+import com.rentflow.payment.port.in.CreateInvoiceForContractUseCase;
 import com.rentflow.shared.AuditEntry;
 import com.rentflow.shared.DomainEvent;
 import com.rentflow.shared.DomainException;
@@ -49,6 +51,7 @@ import com.rentflow.shared.InvalidStateTransitionException;
 import com.rentflow.shared.ResourceNotFoundException;
 import com.rentflow.shared.VehicleNotAvailableException;
 import com.rentflow.shared.id.ContractId;
+import com.rentflow.shared.id.InvoiceId;
 import com.rentflow.shared.money.Money;
 import com.rentflow.shared.port.out.AuditLogPort;
 import com.rentflow.shared.port.out.DomainEventPublisher;
@@ -87,6 +90,7 @@ public class ContractApplicationService implements OpenContractUseCase, RecordPi
     private final AuditLogPort auditLogPort;
     private final FileStoragePort fileStoragePort;
     private final ReservationPricingService pricingService;
+    private final CreateInvoiceForContractUseCase createInvoice;
 
     public ContractApplicationService(ContractRepository contractRepository,
                                       DamageReportRepository damageReportRepository,
@@ -97,7 +101,8 @@ public class ContractApplicationService implements OpenContractUseCase, RecordPi
                                       DomainEventPublisher eventPublisher,
                                       AuditLogPort auditLogPort,
                                       FileStoragePort fileStoragePort,
-                                      ReservationPricingService pricingService) {
+                                      ReservationPricingService pricingService,
+                                      CreateInvoiceForContractUseCase createInvoice) {
         this.contractRepository = contractRepository;
         this.damageReportRepository = damageReportRepository;
         this.reservationRepository = reservationRepository;
@@ -108,6 +113,7 @@ public class ContractApplicationService implements OpenContractUseCase, RecordPi
         this.auditLogPort = auditLogPort;
         this.fileStoragePort = fileStoragePort;
         this.pricingService = pricingService;
+        this.createInvoice = createInvoice;
     }
 
     @Override
@@ -194,8 +200,22 @@ public class ContractApplicationService implements OpenContractUseCase, RecordPi
         publishEvents(vehicle.pullDomainEvents());
         publishEvents(reservation.pullDomainEvents());
         auditLogPort.log(AuditEntry.of("RETURN_RECORDED", contract.getId(), command.performedBy()));
+
+        InvoiceId invoiceId = createInvoice.createForContract(new CreateInvoiceForContractCommand(
+                contract.getId(),
+                contract.getCustomerId(),
+                contract.getReservationId(),
+                reservation.getBaseAmount(),
+                reservation.getDiscountAmount(),
+                reservation.getTaxAmount(),
+                lateFee,
+                fuelSurcharge,
+                reservation.getDepositAmount(),
+                reservation.getBaseAmount().currency(),
+                (int) reservation.getRentalPeriod().durationInDays()));
+
         return new ReturnSummary(contract.getId(), hasDamage, damageReportId, lateFee, fuelSurcharge,
-                lateFee.add(fuelSurcharge));
+                lateFee.add(fuelSurcharge), invoiceId);
     }
 
     @Override

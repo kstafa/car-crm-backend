@@ -67,7 +67,8 @@ public class ContractMapper {
         return new ReturnSummaryResponse(summary.contractId().value(), summary.damageDetected(),
                 summary.damageReportId() == null ? null : summary.damageReportId().value(),
                 summary.lateFee().amount(), summary.fuelSurcharge().amount(), summary.totalSurcharges().amount(),
-                summary.totalSurcharges().currency().getCurrencyCode());
+                summary.totalSurcharges().currency().getCurrencyCode(),
+                summary.invoiceId() == null ? null : summary.invoiceId().value());
     }
 
     private static InspectionChecklist checklist(InspectionChecklistRequest request) {

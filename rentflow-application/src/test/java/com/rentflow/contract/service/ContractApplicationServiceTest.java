@@ -23,6 +23,8 @@ import com.rentflow.contract.port.out.DamageReportRepository;
 import com.rentflow.fleet.Vehicle;
 import com.rentflow.fleet.VehicleStatus;
 import com.rentflow.fleet.port.out.VehicleRepository;
+import com.rentflow.payment.command.CreateInvoiceForContractCommand;
+import com.rentflow.payment.port.in.CreateInvoiceForContractUseCase;
 import com.rentflow.reservation.DateRange;
 import com.rentflow.reservation.Reservation;
 import com.rentflow.reservation.ReservationPricingService;
@@ -37,6 +39,7 @@ import com.rentflow.shared.ResourceNotFoundException;
 import com.rentflow.shared.VehicleNotAvailableException;
 import com.rentflow.shared.id.ContractId;
 import com.rentflow.shared.id.CustomerId;
+import com.rentflow.shared.id.InvoiceId;
 import com.rentflow.shared.id.ReservationId;
 import com.rentflow.shared.id.StaffId;
 import com.rentflow.shared.id.VehicleCategoryId;
@@ -92,6 +95,8 @@ class ContractApplicationServiceTest {
     private FileStoragePort fileStorage;
     @Mock
     private ReservationPricingService pricingService;
+    @Mock
+    private CreateInvoiceForContractUseCase createInvoice;
 
     private ContractApplicationService service;
     private StaffId staffId;
@@ -99,10 +104,12 @@ class ContractApplicationServiceTest {
     @BeforeEach
     void setUp() {
         service = new ContractApplicationService(contractRepository, damageReportRepository, reservationRepository,
-                vehicleRepository, availabilityPort, cachePort, eventPublisher, auditLog, fileStorage, pricingService);
+                vehicleRepository, availabilityPort, cachePort, eventPublisher, auditLog, fileStorage, pricingService,
+                createInvoice);
         staffId = StaffId.generate();
         lenient().when(pricingService.calculateLateFee(any(), any(), any())).thenReturn(money("0.00"));
         lenient().when(pricingService.calculateFuelSurcharge(any(), any(), any(), anyInt())).thenReturn(money("0.00"));
+        lenient().when(createInvoice.createForContract(any())).thenReturn(InvoiceId.generate());
     }
 
     @Test
@@ -217,6 +224,7 @@ class ContractApplicationServiceTest {
         assertEquals(VehicleStatus.AVAILABLE, flow.vehicle().getStatus());
         assertEquals(ReservationStatus.COMPLETED, flow.reservation().getStatus());
         assertEquals(com.rentflow.contract.ContractStatus.COMPLETED, flow.contract().getStatus());
+        assertNotNull(summary.invoiceId());
     }
 
     @Test
@@ -228,6 +236,7 @@ class ContractApplicationServiceTest {
 
         assertTrue(summary.damageDetected());
         assertNotNull(summary.damageReportId());
+        assertNotNull(summary.invoiceId());
         assertEquals(VehicleStatus.AVAILABLE, flow.vehicle().getStatus());
         verify(damageReportRepository).save(any(DamageReport.class));
     }
@@ -253,6 +262,7 @@ class ContractApplicationServiceTest {
                 null));
 
         assertEquals(money("45.00"), summary.lateFee());
+        assertNotNull(summary.invoiceId());
         verify(pricingService).calculateLateFee(eq(flow.contract().getScheduledReturn()), any(ZonedDateTime.class),
                 eq(ContractApplicationService.LATE_FEE_HOURLY_RATE));
     }
@@ -268,6 +278,7 @@ class ContractApplicationServiceTest {
                 null, FuelLevel.HALF));
 
         assertEquals(money("62.50"), summary.fuelSurcharge());
+        assertNotNull(summary.invoiceId());
     }
 
     @Test
@@ -280,6 +291,18 @@ class ContractApplicationServiceTest {
         assertEquals(money("0.00"), summary.lateFee());
         assertEquals(money("0.00"), summary.fuelSurcharge());
         assertEquals(money("0.00"), summary.totalSurcharges());
+        assertNotNull(summary.invoiceId());
+    }
+
+    @Test
+    void recordReturn_completedContract_createsInvoiceViaPort() {
+        Flow flow = returnFlow(InspectionChecklist.allOk(), null);
+
+        ReturnSummary summary = service.recordReturn(returnCommand(flow.contract().getId(), InspectionChecklist.allOk(),
+                null));
+
+        verify(createInvoice).createForContract(any(CreateInvoiceForContractCommand.class));
+        assertNotNull(summary.invoiceId());
     }
 
     @Test

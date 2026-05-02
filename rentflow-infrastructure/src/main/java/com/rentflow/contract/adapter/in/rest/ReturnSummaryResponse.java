@@ -10,6 +10,7 @@ public record ReturnSummaryResponse(
         BigDecimal lateFee,
         BigDecimal fuelSurcharge,
         BigDecimal totalSurcharges,
-        String currency
+        String currency,
+        UUID invoiceId
 ) {
 }

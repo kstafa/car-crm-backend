@@ -12,9 +12,6 @@ public record Money(BigDecimal amount, Currency currency) {
     public Money {
         Objects.requireNonNull(amount);
         Objects.requireNonNull(currency);
-        if (amount.signum() < 0) {
-            throw new IllegalArgumentException("Money amount cannot be negative");
-        }
         amount = amount.setScale(2, RoundingMode.HALF_UP);
     }
 

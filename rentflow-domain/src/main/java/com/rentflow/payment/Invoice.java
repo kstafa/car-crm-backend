@@ -2,12 +2,14 @@ package com.rentflow.payment;
 
 import com.rentflow.shared.AggregateRoot;
 import com.rentflow.shared.DomainException;
+import com.rentflow.shared.InvalidStateTransitionException;
 import com.rentflow.shared.id.ContractId;
 import com.rentflow.shared.id.CustomerId;
 import com.rentflow.shared.id.InvoiceId;
 import com.rentflow.shared.money.Money;
 
 import java.security.SecureRandom;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,10 +28,13 @@ public final class Invoice extends AggregateRoot {
     private InvoiceStatus status;
     private final List<LineItem> lineItems;
     private Money paidAmount;
+    private final LocalDate issueDate;
     private final LocalDate dueDate;
+    private final List<Payment> payments;
 
     private Invoice(InvoiceId id, String invoiceNumber, ContractId contractId, CustomerId customerId,
-                    InvoiceStatus status, List<LineItem> lineItems, Money paidAmount, LocalDate dueDate) {
+                    InvoiceStatus status, List<LineItem> lineItems, Money paidAmount, LocalDate issueDate,
+                    LocalDate dueDate, List<Payment> payments) {
         this.id = id;
         this.invoiceNumber = invoiceNumber;
         this.contractId = contractId;
@@ -37,7 +42,9 @@ public final class Invoice extends AggregateRoot {
         this.status = status;
         this.lineItems = lineItems;
         this.paidAmount = paidAmount;
+        this.issueDate = issueDate;
         this.dueDate = dueDate;
+        this.payments = payments;
     }
 
     public static Invoice create(ContractId contractId, CustomerId customerId, List<LineItem> lineItems,
@@ -58,13 +65,39 @@ public final class Invoice extends AggregateRoot {
                 InvoiceStatus.DRAFT,
                 new ArrayList<>(lineItems),
                 zero,
-                dueDate
+                LocalDate.now(),
+                dueDate,
+                new ArrayList<>()
         );
+    }
+
+    public static Invoice reconstitute(InvoiceId id, String invoiceNumber, ContractId contractId,
+                                       CustomerId customerId, InvoiceStatus status, List<LineItem> lineItems,
+                                       Money paidAmount, LocalDate issueDate, LocalDate dueDate,
+                                       List<Payment> payments) {
+        Objects.requireNonNull(id);
+        Objects.requireNonNull(invoiceNumber);
+        Objects.requireNonNull(contractId);
+        Objects.requireNonNull(customerId);
+        Objects.requireNonNull(status);
+        Objects.requireNonNull(lineItems);
+        Objects.requireNonNull(paidAmount);
+        Objects.requireNonNull(issueDate);
+        Objects.requireNonNull(dueDate);
+        Objects.requireNonNull(payments);
+        if (lineItems.isEmpty()) {
+            throw new IllegalArgumentException("lineItems must not be empty");
+        }
+        return new Invoice(id, invoiceNumber, contractId, customerId, status, new ArrayList<>(lineItems),
+                paidAmount, issueDate, dueDate, new ArrayList<>(payments));
     }
 
     public void recordPayment(Money amount, PaymentMethod method, String reference) {
         Objects.requireNonNull(amount);
         Objects.requireNonNull(method);
+        if (amount.amount().signum() <= 0) {
+            throw new DomainException("Payment amount must be positive");
+        }
         if (status == InvoiceStatus.VOIDED) {
             throw new DomainException("Cannot record payment on voided invoice");
         }
@@ -76,10 +109,19 @@ public final class Invoice extends AggregateRoot {
         boolean wasPaid = status == InvoiceStatus.PAID;
         paidAmount = newPaid;
         status = paidAmount.equals(total) ? InvoiceStatus.PAID : InvoiceStatus.PARTIALLY_PAID;
+        payments.add(new Payment(PaymentId.generate(), amount, method, reference, Instant.now()));
         registerEvent(new PaymentRecordedEvent(id, amount, method));
         if (!wasPaid && status == InvoiceStatus.PAID) {
             registerEvent(new InvoicePaidEvent(id, customerId, total));
         }
+    }
+
+    public void send() {
+        if (status != InvoiceStatus.DRAFT) {
+            throw new InvalidStateTransitionException("Can only send a DRAFT invoice, current: " + status);
+        }
+        status = InvoiceStatus.SENT;
+        registerEvent(new InvoiceSentEvent(id, customerId));
     }
 
     public void voidInvoice() {
@@ -129,8 +171,16 @@ public final class Invoice extends AggregateRoot {
         return paidAmount;
     }
 
+    public LocalDate getIssueDate() {
+        return issueDate;
+    }
+
     public LocalDate getDueDate() {
         return dueDate;
+    }
+
+    public List<Payment> getPayments() {
+        return List.copyOf(payments);
     }
 
     private static String randomInvoiceSuffix() {

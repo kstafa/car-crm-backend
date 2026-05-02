@@ -72,8 +72,10 @@ class MoneyTest {
     }
 
     @Test
-    void constructor_negativeAmount_throwsIllegalArgumentException() {
-        assertThrows(IllegalArgumentException.class, () -> new Money(new BigDecimal("-0.01"), EUR));
+    void constructor_negativeAmount_allowsSignedAmountsForAdjustments() {
+        Money money = new Money(new BigDecimal("-0.01"), EUR);
+
+        assertEquals(new BigDecimal("-0.01"), money.amount());
     }
 
     @Test

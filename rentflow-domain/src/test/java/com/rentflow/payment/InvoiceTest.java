@@ -1,6 +1,7 @@
 package com.rentflow.payment;
 
 import com.rentflow.shared.DomainException;
+import com.rentflow.shared.InvalidStateTransitionException;
 import com.rentflow.shared.id.ContractId;
 import com.rentflow.shared.id.CustomerId;
 import com.rentflow.shared.money.Money;
@@ -97,10 +98,72 @@ class InvoiceTest {
         assertTrue(events.get(1) instanceof InvoicePaidEvent);
     }
 
+    @Test
+    void recordPayment_firstPayment_appearsInPaymentsList() {
+        Invoice invoice = invoice();
+
+        invoice.recordPayment(money("10.00"), PaymentMethod.CARD, "card-ref");
+
+        assertEquals(1, invoice.getPayments().size());
+        assertEquals(money("10.00"), invoice.getPayments().getFirst().amount());
+        assertEquals(PaymentMethod.CARD, invoice.getPayments().getFirst().method());
+        assertEquals("card-ref", invoice.getPayments().getFirst().gatewayReference());
+    }
+
+    @Test
+    void recordPayment_twoPayments_bothAppearInList() {
+        Invoice invoice = invoice();
+
+        invoice.recordPayment(money("10.00"), PaymentMethod.CARD, "card-ref");
+        invoice.recordPayment(money("15.00"), PaymentMethod.CASH, null);
+
+        assertEquals(2, invoice.getPayments().size());
+        assertEquals(PaymentMethod.CARD, invoice.getPayments().get(0).method());
+        assertEquals(PaymentMethod.CASH, invoice.getPayments().get(1).method());
+    }
+
+    @Test
+    void getPayments_returnsImmutableCopy() {
+        Invoice invoice = invoice();
+        invoice.recordPayment(money("10.00"), PaymentMethod.CARD, "card-ref");
+
+        List<Payment> payments = invoice.getPayments();
+
+        assertThrows(UnsupportedOperationException.class, () -> payments.add(
+                new Payment(PaymentId.generate(), money("1.00"), PaymentMethod.CASH, null,
+                        java.time.Instant.now())));
+    }
+
+    @Test
+    void send_draftInvoice_setsSentAndRegistersEvent() {
+        Invoice invoice = invoice();
+
+        invoice.send();
+
+        assertEquals(InvoiceStatus.SENT, invoice.getStatus());
+        assertTrue(invoice.pullDomainEvents().getFirst() instanceof InvoiceSentEvent);
+    }
+
+    @Test
+    void send_alreadySent_throwsInvalidStateTransition() {
+        Invoice invoice = invoice();
+        invoice.send();
+
+        assertThrows(InvalidStateTransitionException.class, invoice::send);
+    }
+
+    @Test
+    void send_paidInvoice_throwsInvalidStateTransition() {
+        Invoice invoice = invoice();
+        invoice.recordPayment(money("25.00"), PaymentMethod.CARD, "card-ref");
+
+        assertThrows(InvalidStateTransitionException.class, invoice::send);
+    }
+
     private static Invoice invoice() {
         return Invoice.create(ContractId.generate(), CustomerId.generate(), List.of(
-                new LineItem("rental", money("10.00"), 2),
-                new LineItem("fee", money("5.00"), 1)
+                new LineItem("rental", InvoiceLineItemType.RENTAL_BASE, money("10.00"), 2),
+                new LineItem("fee", InvoiceLineItemType.LATE_FEE, money("5.00"), 1)
         ), LocalDate.now().plusDays(7));
     }
 
