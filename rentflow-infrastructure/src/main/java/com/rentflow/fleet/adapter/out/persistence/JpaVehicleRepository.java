@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,14 +20,20 @@ import java.util.Optional;
 @Component
 @Primary
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class JpaVehicleRepository implements VehicleRepository {
     private final SpringDataVehicleRepo repo;
     private final VehicleJpaMapper mapper;
 
     @Override
+    @Transactional
     public void save(Vehicle vehicle) {
         VehicleJpaEntity entity = mapper.toJpa(vehicle);
-        repo.findById(entity.id).ifPresent(existing -> entity.version = existing.version);
+        repo.findById(entity.id).ifPresent(existing -> {
+            entity.createdAt = existing.createdAt;
+            entity.createdBy = existing.createdBy;
+            entity.version = existing.version;
+        });
         repo.save(entity);
     }
 

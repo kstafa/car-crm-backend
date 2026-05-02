@@ -2,14 +2,18 @@ package com.rentflow.shared.adapter.out;
 
 import com.rentflow.reservation.DateRange;
 import com.rentflow.reservation.Reservation;
+import com.rentflow.reservation.model.ConflictRow;
+import com.rentflow.reservation.model.ReservationCalendarRow;
 import com.rentflow.reservation.model.ReservationSummary;
 import com.rentflow.reservation.port.out.ReservationRepository;
 import com.rentflow.reservation.query.ListReservationsQuery;
 import com.rentflow.shared.id.ReservationId;
+import com.rentflow.shared.id.VehicleCategoryId;
 import com.rentflow.shared.id.VehicleId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,6 +51,16 @@ public class NoOpReservationRepository implements ReservationRepository {
 
     @Override
     public List<ReservationSummary> findOverdue() {
+        return List.of();
+    }
+
+    @Override
+    public List<ReservationCalendarRow> findForCalendar(LocalDate from, LocalDate to, VehicleCategoryId categoryId) {
+        return List.of();
+    }
+
+    @Override
+    public List<ConflictRow> findDraftConflicts() {
         return List.of();
     }
 }

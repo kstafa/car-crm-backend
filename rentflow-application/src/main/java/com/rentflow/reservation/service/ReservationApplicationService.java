@@ -6,19 +6,31 @@ import com.rentflow.fleet.port.out.VehicleRepository;
 import com.rentflow.reservation.DateRange;
 import com.rentflow.reservation.Reservation;
 import com.rentflow.reservation.ReservationPricingService;
+import com.rentflow.reservation.command.ApplyDiscountCommand;
 import com.rentflow.reservation.command.CancelReservationCommand;
 import com.rentflow.reservation.command.ConfirmReservationCommand;
 import com.rentflow.reservation.command.CreateReservationCommand;
+import com.rentflow.reservation.command.ExtendReservationCommand;
+import com.rentflow.reservation.model.CalendarEntry;
+import com.rentflow.reservation.model.ConflictSummary;
 import com.rentflow.reservation.model.ReservationDetail;
 import com.rentflow.reservation.model.ReservationSummary;
+import com.rentflow.reservation.port.in.ApplyDiscountUseCase;
 import com.rentflow.reservation.port.in.CancelReservationUseCase;
 import com.rentflow.reservation.port.in.ConfirmReservationUseCase;
 import com.rentflow.reservation.port.in.CreateReservationUseCase;
+import com.rentflow.reservation.port.in.ExtendReservationUseCase;
+import com.rentflow.reservation.port.in.GetReservationCalendarUseCase;
+import com.rentflow.reservation.port.in.GetReservationConflictsUseCase;
 import com.rentflow.reservation.port.in.GetReservationUseCase;
+import com.rentflow.reservation.port.in.ListOverdueUseCase;
 import com.rentflow.reservation.port.in.ListReservationsUseCase;
+import com.rentflow.reservation.port.in.ListTodayPickupsUseCase;
+import com.rentflow.reservation.port.in.ListTodayReturnsUseCase;
 import com.rentflow.reservation.port.out.AvailabilityCachePort;
 import com.rentflow.reservation.port.out.ReservationRepository;
 import com.rentflow.reservation.port.out.VehicleAvailabilityPort;
+import com.rentflow.reservation.query.GetCalendarQuery;
 import com.rentflow.reservation.query.ListReservationsQuery;
 import com.rentflow.shared.AuditEntry;
 import com.rentflow.shared.BlacklistedCustomerException;
@@ -35,11 +47,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Currency;
+import java.util.Comparator;
+import java.util.List;
 
 @Service
 @Transactional
 public class ReservationApplicationService implements CreateReservationUseCase, ConfirmReservationUseCase,
-        CancelReservationUseCase, GetReservationUseCase, ListReservationsUseCase {
+        CancelReservationUseCase, ExtendReservationUseCase, ApplyDiscountUseCase, GetReservationUseCase,
+        ListReservationsUseCase, GetReservationCalendarUseCase, GetReservationConflictsUseCase,
+        ListTodayPickupsUseCase, ListTodayReturnsUseCase, ListOverdueUseCase {
 
     private static final Currency EUR = Currency.getInstance("EUR");
 
@@ -79,10 +95,6 @@ public class ReservationApplicationService implements CreateReservationUseCase, 
         }
 
         DateRange period = new DateRange(cmd.pickupDatetime(), cmd.returnDatetime());
-        if (!vehicleAvailabilityPort.isAvailable(cmd.vehicleId(), period)) {
-            throw new VehicleNotAvailableException(cmd.vehicleId(), period);
-        }
-
         Money dailyRate = new Money(new BigDecimal("100.00"), EUR);
         Money baseAmount = pricingService.calculateBaseAmount(dailyRate, period);
         Reservation reservation = Reservation.create(cmd.customerId(), cmd.vehicleId(), period, baseAmount,
@@ -91,7 +103,6 @@ public class ReservationApplicationService implements CreateReservationUseCase, 
         reservationRepository.save(reservation);
         publishEvents(reservation);
         auditLogPort.log(AuditEntry.of("CREATE_RESERVATION", reservation.getId(), cmd.createdBy()));
-        availabilityCachePort.invalidate(reservation.getVehicleId());
         return reservation.getId();
     }
 
@@ -120,6 +131,30 @@ public class ReservationApplicationService implements CreateReservationUseCase, 
     }
 
     @Override
+    public void extend(ExtendReservationCommand cmd) {
+        Reservation reservation = loadReservation(cmd.reservationId());
+        DateRange extensionPeriod = new DateRange(reservation.getRentalPeriod().end(), cmd.newReturnDatetime());
+        if (!vehicleAvailabilityPort.isAvailable(reservation.getVehicleId(), extensionPeriod)) {
+            throw new VehicleNotAvailableException(reservation.getVehicleId(), extensionPeriod);
+        }
+
+        reservation.extend(cmd.newReturnDatetime());
+        reservationRepository.save(reservation);
+        publishEvents(reservation);
+        auditLogPort.log(AuditEntry.of("RESERVATION_EXTENDED", reservation.getId(), cmd.extendedBy()));
+        availabilityCachePort.invalidate(reservation.getVehicleId());
+    }
+
+    @Override
+    public void apply(ApplyDiscountCommand cmd) {
+        Reservation reservation = loadReservation(cmd.reservationId());
+        Money discountAmount = reservation.getBaseAmount().multiply(cmd.discountPercent());
+        reservation.applyDiscount(discountAmount);
+        reservationRepository.save(reservation);
+        auditLogPort.log(AuditEntry.of("DISCOUNT_APPLIED", reservation.getId(), cmd.appliedBy()));
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public ReservationDetail get(ReservationId id) {
         Reservation reservation = loadReservation(id);
@@ -143,6 +178,61 @@ public class ReservationApplicationService implements CreateReservationUseCase, 
     @Transactional(readOnly = true)
     public Page<ReservationSummary> list(ListReservationsQuery q) {
         return reservationRepository.findAll(q);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CalendarEntry> getCalendar(GetCalendarQuery query) {
+        return reservationRepository.findForCalendar(query.from(), query.to(), query.categoryId())
+                .stream()
+                .map(row -> new CalendarEntry(
+                        row.reservationId(),
+                        row.reservationNumber(),
+                        row.vehicleId(),
+                        row.vehicleLicensePlate(),
+                        row.vehicleBrand(),
+                        row.vehicleModel(),
+                        row.customerId(),
+                        row.customerFirstName() + " " + row.customerLastName(),
+                        row.pickupDatetime(),
+                        row.returnDatetime(),
+                        row.status()))
+                .sorted(Comparator.comparing(CalendarEntry::pickupDatetime))
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ConflictSummary> getConflicts() {
+        return reservationRepository.findDraftConflicts()
+                .stream()
+                .map(row -> new ConflictSummary(
+                        row.draftId(),
+                        row.draftNumber(),
+                        row.vehicleId(),
+                        new DateRange(row.draftStart(), row.draftEnd()),
+                        row.conflictingId(),
+                        row.conflictingNumber(),
+                        row.conflictingStatus()))
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReservationSummary> listPickups() {
+        return reservationRepository.findTodayPickups();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReservationSummary> listReturns() {
+        return reservationRepository.findTodayReturns();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReservationSummary> listOverdue() {
+        return reservationRepository.findOverdue();
     }
 
     private Reservation loadReservation(ReservationId id) {

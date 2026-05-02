@@ -2,22 +2,28 @@ package com.rentflow.reservation.adapter.out.persistence;
 
 import com.rentflow.reservation.DateRange;
 import com.rentflow.reservation.Reservation;
+import com.rentflow.reservation.model.ConflictRow;
+import com.rentflow.reservation.model.ReservationCalendarRow;
 import com.rentflow.reservation.model.ReservationSummary;
 import com.rentflow.reservation.port.out.ReservationRepository;
 import com.rentflow.reservation.query.ListReservationsQuery;
 import com.rentflow.shared.id.ReservationId;
+import com.rentflow.shared.id.VehicleCategoryId;
 import com.rentflow.shared.id.VehicleId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 @Primary
@@ -29,7 +35,11 @@ public class JpaReservationRepository implements ReservationRepository {
     @Override
     public void save(Reservation reservation) {
         ReservationJpaEntity entity = mapper.toJpa(reservation);
-        repo.findById(entity.id).ifPresent(existing -> entity.version = existing.version);
+        repo.findById(entity.id).ifPresent(existing -> {
+            entity.createdAt = existing.createdAt;
+            entity.createdBy = existing.createdBy;
+            entity.version = existing.version;
+        });
         repo.save(entity);
     }
 
@@ -73,5 +83,20 @@ public class JpaReservationRepository implements ReservationRepository {
     @Override
     public List<ReservationSummary> findOverdue() {
         return repo.findOverdue(ZonedDateTime.now()).stream().map(mapper::toSummary).toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReservationCalendarRow> findForCalendar(LocalDate from, LocalDate to, VehicleCategoryId categoryId) {
+        ZonedDateTime fromInstant = from.atStartOfDay(ZoneOffset.UTC);
+        ZonedDateTime toInstant = to.plusDays(1).atStartOfDay(ZoneOffset.UTC);
+        UUID catId = categoryId != null ? categoryId.value() : null;
+        return repo.findForCalendar(fromInstant, toInstant, catId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ConflictRow> findDraftConflicts() {
+        return repo.findDraftConflicts();
     }
 }

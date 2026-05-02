@@ -4,6 +4,8 @@ import com.rentflow.AbstractJpaAdapterTest;
 import com.rentflow.reservation.DateRange;
 import com.rentflow.reservation.Reservation;
 import com.rentflow.reservation.ReservationStatus;
+import com.rentflow.reservation.model.ConflictRow;
+import com.rentflow.reservation.model.ReservationCalendarRow;
 import com.rentflow.reservation.model.ReservationSummary;
 import com.rentflow.reservation.query.ListReservationsQuery;
 import com.rentflow.shared.id.CustomerId;
@@ -161,6 +163,75 @@ class JpaReservationRepositoryTest extends AbstractJpaAdapterTest {
                 null, null, 0, 20));
 
         assertThat(result.getContent()).extracting(ReservationSummary::id).containsExactly(cancelled.getId());
+    }
+
+    @Test
+    void findForCalendar_reservationInRange_returnsCalendarRow() {
+        CustomerId customerId = insertCustomer();
+        VehicleId vehicleId = insertVehicle("CAL-001");
+        Reservation reservation = confirmedReservation(customerId, vehicleId, PICKUP.plusDays(3), PICKUP.plusDays(7));
+        repository.save(reservation);
+
+        List<ReservationCalendarRow> result = repository.findForCalendar(PICKUP.toLocalDate(),
+                PICKUP.plusDays(10).toLocalDate(), null);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().reservationId()).isEqualTo(reservation.getId());
+        assertThat(result.getFirst().vehicleLicensePlate()).isEqualTo("CAL-001");
+        assertThat(result.getFirst().customerFirstName()).isEqualTo("Ada");
+    }
+
+    @Test
+    void findForCalendar_cancelledReservation_excluded() {
+        Reservation reservation = reservation(insertCustomer(), insertVehicle("CAL-002"), PICKUP.plusDays(3),
+                PICKUP.plusDays(7));
+        reservation.cancel("customer request");
+        repository.save(reservation);
+
+        List<ReservationCalendarRow> result = repository.findForCalendar(PICKUP.toLocalDate(),
+                PICKUP.plusDays(10).toLocalDate(), null);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void findForCalendar_reservationOutsideRange_excluded() {
+        Reservation reservation = confirmedReservation(insertCustomer(), insertVehicle("CAL-003"), PICKUP.plusDays(20),
+                PICKUP.plusDays(25));
+        repository.save(reservation);
+
+        List<ReservationCalendarRow> result = repository.findForCalendar(PICKUP.toLocalDate(),
+                PICKUP.plusDays(10).toLocalDate(), null);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void findDraftConflicts_draftWithConflictingConfirmed_returnsConflictRow() {
+        VehicleId vehicleId = insertVehicle("CON-001");
+        Reservation confirmed = confirmedReservation(insertCustomer(), vehicleId, PICKUP, PICKUP.plusDays(5));
+        Reservation draft = reservation(insertCustomer(), vehicleId, PICKUP.plusDays(3), PICKUP.plusDays(7));
+        repository.save(confirmed);
+        repository.save(draft);
+
+        List<ConflictRow> result = repository.findDraftConflicts();
+
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().draftId()).isEqualTo(draft.getId());
+        assertThat(result.getFirst().conflictingId()).isEqualTo(confirmed.getId());
+    }
+
+    @Test
+    void findDraftConflicts_noConflictingReservations_returnsEmpty() {
+        VehicleId vehicleId = insertVehicle("CON-002");
+        Reservation confirmed = confirmedReservation(insertCustomer(), vehicleId, PICKUP, PICKUP.plusDays(5));
+        Reservation draft = reservation(insertCustomer(), vehicleId, PICKUP.plusDays(5), PICKUP.plusDays(7));
+        repository.save(confirmed);
+        repository.save(draft);
+
+        List<ConflictRow> result = repository.findDraftConflicts();
+
+        assertThat(result).isEmpty();
     }
 
     private Reservation confirmedReservation(CustomerId customerId, VehicleId vehicleId, ZonedDateTime pickup,

@@ -23,7 +23,10 @@ public class JpaCustomerRepository implements CustomerRepository {
     @Override
     public void save(Customer customer) {
         CustomerJpaEntity entity = mapper.toJpa(customer);
-        repo.findById(entity.id).ifPresent(existing -> entity.version = existing.version);
+        repo.findById(entity.id).ifPresent(existing -> {
+            entity.createdAt = existing.createdAt;
+            entity.version = existing.version;
+        });
         repo.save(entity);
     }
 

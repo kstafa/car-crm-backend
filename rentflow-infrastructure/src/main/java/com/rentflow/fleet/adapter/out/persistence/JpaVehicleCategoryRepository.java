@@ -19,7 +19,10 @@ public class JpaVehicleCategoryRepository implements VehicleCategoryRepository {
     @Override
     public void save(VehicleCategory category) {
         VehicleCategoryJpaEntity entity = mapper.toJpa(category);
-        repo.findById(entity.id).ifPresent(existing -> entity.version = existing.version);
+        repo.findById(entity.id).ifPresent(existing -> {
+            entity.createdAt = existing.createdAt;
+            entity.version = existing.version;
+        });
         repo.save(entity);
     }
 

@@ -57,7 +57,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     ResponseEntity<ApiErrorResponse> illegalArgument(IllegalArgumentException ex) {
-        return response(HttpStatus.BAD_REQUEST, "INVALID_REQUEST", ex.getMessage());
+        return response(HttpStatus.BAD_REQUEST, "INVALID_ARGUMENT", ex.getMessage());
     }
 
     @ExceptionHandler(AccessDeniedException.class)

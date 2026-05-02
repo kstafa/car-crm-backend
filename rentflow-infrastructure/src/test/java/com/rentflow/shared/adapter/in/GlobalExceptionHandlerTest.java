@@ -88,6 +88,13 @@ class GlobalExceptionHandlerTest {
                 .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
     }
 
+    @Test
+    void illegalArgument_returns400WithCode() throws Exception {
+        mockMvc.perform(get("/test/illegal-argument"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("INVALID_ARGUMENT"));
+    }
+
     @RestController
     static class ExceptionController {
 
@@ -121,6 +128,11 @@ class GlobalExceptionHandlerTest {
         @GetMapping("/test/access-denied")
         public void accessDenied() {
             throw new AccessDeniedException("forbidden");
+        }
+
+        @GetMapping("/test/illegal-argument")
+        public void illegalArgument() {
+            throw new IllegalArgumentException("invalid argument");
         }
     }
 
