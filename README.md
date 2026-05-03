@@ -61,6 +61,19 @@ curl -X POST http://localhost:8080/api/v1/auth/login \
   -d '{"email":"admin@rentflow.com","password":"changeme"}'
 ```
 
+## Insomnia Collection
+
+Import `insomnia-rentflow-backend.json` into Insomnia to get the full backend API collection.
+
+The collection includes a `Local Development` environment with:
+
+- `base_url`: `http://localhost:8080`
+- `admin_email`: `admin@rentflow.com`
+- `admin_password`: `changeme`
+- `access_token`: used by every protected endpoint
+
+Run the `Auth / Login` request first. Recent Insomnia versions should copy `accessToken` into `access_token` automatically; otherwise copy it from the login response into the environment variable manually.
+
 ## Useful Commands
 
 Check Postgres:

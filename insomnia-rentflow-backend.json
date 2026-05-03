@@ -1,0 +1,1819 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-05-03T00:00:00.000Z",
+  "__export_source": "codex",
+  "resources": [
+    {
+      "_id": "wrk_rentflow_backend",
+      "parentId": null,
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "name": "RentFlow Backend",
+      "description": "Complete RentFlow backend API collection for local development.",
+      "scope": "collection",
+      "_type": "workspace"
+    },
+    {
+      "_id": "env_rentflow_local",
+      "parentId": "wrk_rentflow_backend",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "name": "Local Development",
+      "data": {
+        "base_url": "http://localhost:8080",
+        "access_token": "",
+        "admin_email": "admin@rentflow.com",
+        "admin_password": "changeme",
+        "category_id": "cccccccc-cccc-cccc-cccc-cccccccccc01",
+        "template_id": "eeeeeeee-eeee-eeee-eeee-eeeeeeeeee01",
+        "automation_rule_id": "ffffffff-ffff-ffff-ffff-ffffffffffff",
+        "customer_id": "00000000-0000-0000-0000-000000000000",
+        "vehicle_id": "00000000-0000-0000-0000-000000000000",
+        "reservation_id": "00000000-0000-0000-0000-000000000000",
+        "contract_id": "00000000-0000-0000-0000-000000000000",
+        "damage_report_id": "00000000-0000-0000-0000-000000000000",
+        "invoice_id": "00000000-0000-0000-0000-000000000000",
+        "refund_id": "00000000-0000-0000-0000-000000000000",
+        "deposit_id": "00000000-0000-0000-0000-000000000000",
+        "notification_id": "00000000-0000-0000-0000-000000000000",
+        "date_from": "2026-05-03",
+        "date_to": "2026-05-10",
+        "pickup_datetime": "2026-05-03T10:00:00+02:00",
+        "return_datetime": "2026-05-10T10:00:00+02:00",
+        "sample_file": ""
+      },
+      "dataPropertyOrder": {
+        "&": [
+          "base_url",
+          "access_token",
+          "admin_email",
+          "admin_password",
+          "category_id",
+          "template_id",
+          "automation_rule_id",
+          "customer_id",
+          "vehicle_id",
+          "reservation_id",
+          "contract_id",
+          "damage_report_id",
+          "invoice_id",
+          "refund_id",
+          "deposit_id",
+          "notification_id",
+          "date_from",
+          "date_to",
+          "pickup_datetime",
+          "return_datetime",
+          "sample_file"
+        ]
+      },
+      "color": "#0B7285",
+      "isPrivate": false,
+      "_type": "environment"
+    },
+    {
+      "_id": "fld_auth",
+      "parentId": "wrk_rentflow_backend",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "name": "Auth",
+      "description": "",
+      "environment": {},
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_dashboard",
+      "parentId": "wrk_rentflow_backend",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "name": "Dashboard",
+      "description": "",
+      "environment": {},
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_customers",
+      "parentId": "wrk_rentflow_backend",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "name": "Customers",
+      "description": "",
+      "environment": {},
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_fleet",
+      "parentId": "wrk_rentflow_backend",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "name": "Fleet",
+      "description": "",
+      "environment": {},
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_reservations",
+      "parentId": "wrk_rentflow_backend",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "name": "Reservations",
+      "description": "",
+      "environment": {},
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_contracts",
+      "parentId": "wrk_rentflow_backend",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "name": "Contracts",
+      "description": "",
+      "environment": {},
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_damage_reports",
+      "parentId": "wrk_rentflow_backend",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "name": "Damage Reports",
+      "description": "",
+      "environment": {},
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_payments",
+      "parentId": "wrk_rentflow_backend",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "name": "Payments",
+      "description": "",
+      "environment": {},
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_notifications",
+      "parentId": "wrk_rentflow_backend",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "name": "Notifications",
+      "description": "",
+      "environment": {},
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_reports",
+      "parentId": "wrk_rentflow_backend",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "name": "Reports",
+      "description": "",
+      "environment": {},
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_auth_login",
+      "parentId": "fld_auth",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/auth/login",
+      "name": "Login",
+      "description": "Uses the seeded local admin. If your Insomnia version does not run response scripts, copy accessToken from the response into the access_token environment variable.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"{{ _.admin_email }}\",\n  \"password\": \"{{ _.admin_password }}\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "afterResponseScript": "const body = insomnia.response.json();\nif (body.accessToken) {\n  insomnia.environment.set('access_token', body.accessToken);\n}",
+      "_type": "request"
+    },
+    {
+      "_id": "req_auth_health",
+      "parentId": "fld_auth",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/actuator/health",
+      "name": "Health",
+      "description": "Public health endpoint.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_dashboard_kpis",
+      "parentId": "fld_dashboard",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/dashboard/kpis?date={{ _.date_from }}",
+      "name": "Get KPIs",
+      "description": "Requires REPORT_VIEW.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_dashboard_upcoming_events",
+      "parentId": "fld_dashboard",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/dashboard/upcoming-events?hours=48",
+      "name": "Get Upcoming Events",
+      "description": "Requires REPORT_VIEW.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_dashboard_alerts",
+      "parentId": "fld_dashboard",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/dashboard/alerts",
+      "name": "Get Alerts",
+      "description": "Requires REPORT_VIEW.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_dashboard_revenue_sparkline",
+      "parentId": "fld_dashboard",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/dashboard/revenue-sparkline?days=30",
+      "name": "Get Revenue Sparkline",
+      "description": "Requires REPORT_VIEW.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_customers_list",
+      "parentId": "fld_customers",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/customers?page=0&size=20",
+      "name": "List Customers",
+      "description": "Optional query params: status=ACTIVE|BLACKLISTED|INACTIVE, searchTerm. Requires CUSTOMER_VIEW.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_customers_create",
+      "parentId": "fld_customers",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/customers",
+      "name": "Create Customer",
+      "description": "Requires CUSTOMER_CREATE. Copy the returned id into customer_id.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"firstName\": \"Demo\",\n  \"lastName\": \"Customer\",\n  \"email\": \"demo.customer@example.com\",\n  \"phone\": \"+33123456789\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_customers_get",
+      "parentId": "fld_customers",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/customers/{{ _.customer_id }}",
+      "name": "Get Customer",
+      "description": "Requires CUSTOMER_VIEW.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_customers_blacklist",
+      "parentId": "fld_customers",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/customers/{{ _.customer_id }}/blacklist",
+      "name": "Blacklist Customer",
+      "description": "Requires CUSTOMER_BLACKLIST.",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"reason\": \"Repeated no-show\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_customers_reactivate",
+      "parentId": "fld_customers",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/customers/{{ _.customer_id }}/reactivate",
+      "name": "Reactivate Customer",
+      "description": "Requires CUSTOMER_EDIT.",
+      "method": "PATCH",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_fleet_vehicles_list",
+      "parentId": "fld_fleet",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/fleet/vehicles?activeOnly=true&page=0&size=20",
+      "name": "List Vehicles",
+      "description": "Optional query params: status, categoryId, sortBy. Requires FLEET_VIEW.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_fleet_vehicles_register",
+      "parentId": "fld_fleet",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/fleet/vehicles",
+      "name": "Register Vehicle",
+      "description": "Uses the seeded Economy category by default. Requires FLEET_CREATE. Copy the returned id into vehicle_id.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"licensePlate\": \"RF-001-AA\",\n  \"brand\": \"Renault\",\n  \"model\": \"Clio\",\n  \"year\": 2024,\n  \"categoryId\": \"{{ _.category_id }}\",\n  \"initialMileage\": 1200,\n  \"description\": \"Demo vehicle\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_fleet_vehicles_get",
+      "parentId": "fld_fleet",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/fleet/vehicles/{{ _.vehicle_id }}",
+      "name": "Get Vehicle",
+      "description": "Requires FLEET_VIEW.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_fleet_vehicles_status",
+      "parentId": "fld_fleet",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/fleet/vehicles/{{ _.vehicle_id }}/status",
+      "name": "Update Vehicle Status",
+      "description": "Allowed statuses: AVAILABLE, RENTED, MAINTENANCE, OUT_OF_SERVICE. Requires FLEET_EDIT.",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"status\": \"AVAILABLE\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_fleet_vehicles_delete",
+      "parentId": "fld_fleet",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/fleet/vehicles/{{ _.vehicle_id }}",
+      "name": "Delete Vehicle",
+      "description": "Soft-deactivates the vehicle by setting OUT_OF_SERVICE. Requires FLEET_DELETE.",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_fleet_vehicles_upload_photo",
+      "parentId": "fld_fleet",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/fleet/vehicles/{{ _.vehicle_id }}/photos",
+      "name": "Upload Vehicle Photo",
+      "description": "Select a file in the multipart body before sending. Requires FLEET_EDIT.",
+      "method": "POST",
+      "body": {
+        "mimeType": "multipart/form-data",
+        "params": [
+          {
+            "name": "file",
+            "value": "",
+            "description": "Vehicle photo file",
+            "type": "file",
+            "fileName": "{{ _.sample_file }}"
+          }
+        ]
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_fleet_availability",
+      "parentId": "fld_fleet",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/fleet/availability?categoryId={{ _.category_id }}&pickupDatetime={{ _.pickup_datetime }}&returnDatetime={{ _.return_datetime }}",
+      "name": "Find Available Vehicles",
+      "description": "Requires FLEET_VIEW.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_fleet_categories_list",
+      "parentId": "fld_fleet",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/fleet/categories",
+      "name": "List Categories",
+      "description": "Requires FLEET_VIEW.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_fleet_categories_create",
+      "parentId": "fld_fleet",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/fleet/categories",
+      "name": "Create Category",
+      "description": "Requires FLEET_CREATE. Copy the returned id into category_id if you want to use the new category.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Compact\",\n  \"description\": \"Compact city cars\",\n  \"baseDailyRate\": 59.99,\n  \"depositAmount\": 350.00,\n  \"taxRate\": 0.20\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_reservations_list",
+      "parentId": "fld_reservations",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/reservations?page=0&size=20",
+      "name": "List Reservations",
+      "description": "Optional query params: status, from, to. Requires RESERVATION_VIEW.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_reservations_create",
+      "parentId": "fld_reservations",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/reservations",
+      "name": "Create Reservation",
+      "description": "Requires RESERVATION_CREATE. Copy the returned id into reservation_id.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"customerId\": \"{{ _.customer_id }}\",\n  \"vehicleId\": \"{{ _.vehicle_id }}\",\n  \"pickupDatetime\": \"{{ _.pickup_datetime }}\",\n  \"returnDatetime\": \"{{ _.return_datetime }}\",\n  \"extras\": [\n    {\n      \"name\": \"Child seat\",\n      \"unitPrice\": 8.00,\n      \"quantity\": 1\n    }\n  ],\n  \"notes\": \"Demo reservation\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_reservations_availability",
+      "parentId": "fld_reservations",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/reservations/availability?categoryId={{ _.category_id }}&pickupDatetime={{ _.pickup_datetime }}&returnDatetime={{ _.return_datetime }}",
+      "name": "Check Reservation Availability",
+      "description": "Requires RESERVATION_VIEW.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_reservations_calendar",
+      "parentId": "fld_reservations",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/reservations/calendar?from={{ _.date_from }}&to={{ _.date_to }}",
+      "name": "Get Reservation Calendar",
+      "description": "Optional query param: categoryId. Requires RESERVATION_VIEW.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_reservations_conflicts",
+      "parentId": "fld_reservations",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/reservations/conflicts",
+      "name": "Get Reservation Conflicts",
+      "description": "Requires RESERVATION_VIEW.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_reservations_today_pickups",
+      "parentId": "fld_reservations",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/reservations/today-pickups",
+      "name": "List Today Pickups",
+      "description": "Requires RESERVATION_VIEW.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_reservations_today_returns",
+      "parentId": "fld_reservations",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/reservations/today-returns",
+      "name": "List Today Returns",
+      "description": "Requires RESERVATION_VIEW.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_reservations_overdue",
+      "parentId": "fld_reservations",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/reservations/overdue",
+      "name": "List Overdue Reservations",
+      "description": "Requires RESERVATION_VIEW.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_reservations_get",
+      "parentId": "fld_reservations",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/reservations/{{ _.reservation_id }}",
+      "name": "Get Reservation",
+      "description": "Requires RESERVATION_VIEW.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_reservations_confirm",
+      "parentId": "fld_reservations",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/reservations/{{ _.reservation_id }}/confirm",
+      "name": "Confirm Reservation",
+      "description": "Requires RESERVATION_EDIT.",
+      "method": "PATCH",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_reservations_cancel",
+      "parentId": "fld_reservations",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/reservations/{{ _.reservation_id }}/cancel",
+      "name": "Cancel Reservation",
+      "description": "Requires RESERVATION_CANCEL.",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"reason\": \"Customer requested cancellation\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_reservations_extend",
+      "parentId": "fld_reservations",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/reservations/{{ _.reservation_id }}/extend",
+      "name": "Extend Reservation",
+      "description": "Requires RESERVATION_EDIT.",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"newReturnDatetime\": \"{{ _.return_datetime }}\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_reservations_discount",
+      "parentId": "fld_reservations",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/reservations/{{ _.reservation_id }}/discount",
+      "name": "Apply Reservation Discount",
+      "description": "discountPercent is 0.0 to 1.0. Requires RESERVATION_EDIT; larger discounts may require RESERVATION_APPROVE_DISCOUNT.",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"discountPercent\": 0.10\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_contracts_list",
+      "parentId": "fld_contracts",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/contracts?page=0&size=20",
+      "name": "List Contracts",
+      "description": "Optional query params: status, vehicleId, customerId. Requires CONTRACT_VIEW.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_contracts_active",
+      "parentId": "fld_contracts",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/contracts/active",
+      "name": "List Active Contracts",
+      "description": "Requires CONTRACT_VIEW.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_contracts_get",
+      "parentId": "fld_contracts",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/contracts/{{ _.contract_id }}",
+      "name": "Get Contract",
+      "description": "Requires CONTRACT_VIEW.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_contracts_open",
+      "parentId": "fld_contracts",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/contracts",
+      "name": "Open Contract",
+      "description": "Requires CONTRACT_CREATE. Copy the returned id into contract_id.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"reservationId\": \"{{ _.reservation_id }}\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_contracts_pickup",
+      "parentId": "fld_contracts",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/contracts/{{ _.contract_id }}/pickup",
+      "name": "Record Pickup",
+      "description": "Fuel levels: EMPTY, QUARTER, HALF, THREE_QUARTERS, FULL. Requires CONTRACT_CREATE.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"preInspection\": {\n    \"frontOk\": true,\n    \"rearOk\": true,\n    \"leftSideOk\": true,\n    \"rightSideOk\": true,\n    \"interiorOk\": true,\n    \"trunkOk\": true,\n    \"tiresOk\": true,\n    \"lightsOk\": true,\n    \"notes\": \"Ready for pickup\"\n  },\n  \"startFuelLevel\": \"FULL\",\n  \"startMileage\": 1200,\n  \"photoKeys\": []\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_contracts_return",
+      "parentId": "fld_contracts",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/contracts/{{ _.contract_id }}/return",
+      "name": "Record Return",
+      "description": "Damage severity: MINOR, MODERATE, MAJOR. Liability: CUSTOMER, AGENCY, THIRD_PARTY, INSURANCE. Requires CONTRACT_CLOSE.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"postInspection\": {\n    \"frontOk\": true,\n    \"rearOk\": true,\n    \"leftSideOk\": true,\n    \"rightSideOk\": true,\n    \"interiorOk\": true,\n    \"trunkOk\": true,\n    \"tiresOk\": true,\n    \"lightsOk\": true,\n    \"notes\": \"Returned clean\"\n  },\n  \"endFuelLevel\": \"FULL\",\n  \"endMileage\": 1450,\n  \"photoKeys\": [],\n  \"damageDescription\": null,\n  \"damageSeverity\": null,\n  \"damageLiability\": null,\n  \"estimatedDamageCost\": null\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_contracts_extend",
+      "parentId": "fld_contracts",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/contracts/{{ _.contract_id }}/extend",
+      "name": "Extend Contract",
+      "description": "Requires CONTRACT_CREATE.",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"newScheduledReturn\": \"{{ _.return_datetime }}\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_contracts_upload_photo",
+      "parentId": "fld_contracts",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/contracts/{{ _.contract_id }}/photos",
+      "name": "Upload Contract Photo",
+      "description": "Select a file in the multipart body before sending. Requires CONTRACT_CREATE.",
+      "method": "POST",
+      "body": {
+        "mimeType": "multipart/form-data",
+        "params": [
+          {
+            "name": "file",
+            "value": "",
+            "description": "Contract photo file",
+            "type": "file",
+            "fileName": "{{ _.sample_file }}"
+          }
+        ]
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_damage_reports_list",
+      "parentId": "fld_damage_reports",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/damage-reports?page=0&size=20",
+      "name": "List Damage Reports",
+      "description": "Optional query params: status=OPEN|UNDER_REPAIR|SETTLED|CLOSED, vehicleId. Requires MAINTENANCE_VIEW.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_damage_reports_create",
+      "parentId": "fld_damage_reports",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/damage-reports",
+      "name": "Create Damage Report",
+      "description": "Requires MAINTENANCE_CREATE. Copy the returned id into damage_report_id.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"vehicleId\": \"{{ _.vehicle_id }}\",\n  \"contractId\": \"{{ _.contract_id }}\",\n  \"customerId\": \"{{ _.customer_id }}\",\n  \"description\": \"Scratch on rear bumper\",\n  \"severity\": \"MINOR\",\n  \"liability\": \"CUSTOMER\",\n  \"estimatedCost\": 120.00\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_damage_reports_get",
+      "parentId": "fld_damage_reports",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/damage-reports/{{ _.damage_report_id }}",
+      "name": "Get Damage Report",
+      "description": "Requires MAINTENANCE_VIEW.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_damage_reports_upload_photo",
+      "parentId": "fld_damage_reports",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/damage-reports/{{ _.damage_report_id }}/photos",
+      "name": "Upload Damage Report Photo",
+      "description": "Select a file in the multipart body before sending. Requires MAINTENANCE_CREATE.",
+      "method": "POST",
+      "body": {
+        "mimeType": "multipart/form-data",
+        "params": [
+          {
+            "name": "file",
+            "value": "",
+            "description": "Damage report photo file",
+            "type": "file",
+            "fileName": "{{ _.sample_file }}"
+          }
+        ]
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_payments_deposits_list",
+      "parentId": "fld_payments",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/deposits?page=0&size=20",
+      "name": "List Deposits",
+      "description": "Optional query params: status=HELD|RELEASED|FORFEITED, customerId. Requires PAYMENT_VIEW.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_payments_deposits_get",
+      "parentId": "fld_payments",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/deposits/{{ _.deposit_id }}",
+      "name": "Get Deposit",
+      "description": "Requires PAYMENT_VIEW.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_payments_deposits_release",
+      "parentId": "fld_payments",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/deposits/{{ _.deposit_id }}/release",
+      "name": "Release Deposit",
+      "description": "Requires PAYMENT_RECORD.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"reason\": \"Vehicle returned with no damage\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_payments_deposits_forfeit",
+      "parentId": "fld_payments",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/deposits/{{ _.deposit_id }}/forfeit",
+      "name": "Forfeit Deposit",
+      "description": "Requires PAYMENT_RECORD.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"reason\": \"Damage charge applied\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_payments_invoices_list",
+      "parentId": "fld_payments",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/invoices?page=0&size=20",
+      "name": "List Invoices",
+      "description": "Optional query params: status, customerId, contractId, from, to. Requires PAYMENT_VIEW.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_payments_invoices_get",
+      "parentId": "fld_payments",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/invoices/{{ _.invoice_id }}",
+      "name": "Get Invoice",
+      "description": "Requires PAYMENT_VIEW.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_payments_invoices_send",
+      "parentId": "fld_payments",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/invoices/{{ _.invoice_id }}/send",
+      "name": "Send Invoice",
+      "description": "Requires PAYMENT_RECORD.",
+      "method": "PATCH",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_payments_invoices_void",
+      "parentId": "fld_payments",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/invoices/{{ _.invoice_id }}/void",
+      "name": "Void Invoice",
+      "description": "Requires PAYMENT_RECORD.",
+      "method": "PATCH",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_payments_invoices_record_payment",
+      "parentId": "fld_payments",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/invoices/{{ _.invoice_id }}/payments",
+      "name": "Record Payment",
+      "description": "Payment methods: CASH, CARD, BANK_TRANSFER, ONLINE. Requires PAYMENT_RECORD.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"amount\": 50.00,\n  \"method\": \"CARD\",\n  \"gatewayReference\": \"demo-payment-reference\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_payments_invoices_pdf",
+      "parentId": "fld_payments",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/invoices/{{ _.invoice_id }}/pdf",
+      "name": "Download Invoice PDF",
+      "description": "Requires PAYMENT_VIEW.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        },
+        {
+          "name": "Accept",
+          "value": "application/pdf"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_payments_refunds_list",
+      "parentId": "fld_payments",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/invoices/{{ _.invoice_id }}/refunds?page=0&size=20",
+      "name": "List Invoice Refunds",
+      "description": "Requires PAYMENT_VIEW.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_payments_refunds_request",
+      "parentId": "fld_payments",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/invoices/{{ _.invoice_id }}/refunds",
+      "name": "Request Refund",
+      "description": "Refund reasons: CANCELLATION, OVERPAYMENT, DAMAGE_RESOLUTION, GOODWILL, OTHER. Payment methods: CASH, CARD, BANK_TRANSFER, ONLINE. Requires PAYMENT_RECORD. Copy the returned id into refund_id.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"amount\": 25.00,\n  \"reason\": \"OTHER\",\n  \"method\": \"CARD\",\n  \"notes\": \"Demo refund\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_payments_refunds_approve",
+      "parentId": "fld_payments",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/refunds/{{ _.refund_id }}/approve",
+      "name": "Approve Refund",
+      "description": "Requires PAYMENT_REFUND_APPROVE.",
+      "method": "PATCH",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_payments_refunds_process",
+      "parentId": "fld_payments",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/refunds/{{ _.refund_id }}/process",
+      "name": "Process Refund",
+      "description": "Requires PAYMENT_REFUND_APPROVE.",
+      "method": "PATCH",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_notifications_list",
+      "parentId": "fld_notifications",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/notifications?page=0&size=20",
+      "name": "List Notifications",
+      "description": "Authenticated staff notifications.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_notifications_mark_read",
+      "parentId": "fld_notifications",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/notifications/{{ _.notification_id }}/read",
+      "name": "Mark Notification Read",
+      "description": "Marks one notification read for the authenticated staff member.",
+      "method": "PATCH",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_notifications_mark_all_read",
+      "parentId": "fld_notifications",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/notifications/read-all",
+      "name": "Mark All Notifications Read",
+      "description": "Marks all notifications read for the authenticated staff member.",
+      "method": "POST",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_notifications_unread_count",
+      "parentId": "fld_notifications",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/notifications/unread-count",
+      "name": "Get Unread Count",
+      "description": "Authenticated staff unread notification count.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_notifications_templates_list",
+      "parentId": "fld_notifications",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/notifications/templates",
+      "name": "List Templates",
+      "description": "Requires SETTINGS_VIEW.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_notifications_templates_create",
+      "parentId": "fld_notifications",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/notifications/templates",
+      "name": "Create Template",
+      "description": "Triggers: RESERVATION_CREATED, RESERVATION_CONFIRMED, RESERVATION_CANCELLED, CONTRACT_OPENED, PICKUP_RECORDED, RETURN_RECORDED, INVOICE_SENT, INVOICE_PAID, DEPOSIT_RELEASED, DOCUMENT_EXPIRING, MAINTENANCE_DUE, RETURN_OVERDUE. Channels: EMAIL, SMS, IN_APP. Requires SETTINGS_EDIT. Copy the returned id into template_id.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Pickup Reminder In App\",\n  \"trigger\": \"PICKUP_RECORDED\",\n  \"channel\": \"IN_APP\",\n  \"subjectTemplate\": \"Pickup recorded\",\n  \"bodyTemplate\": \"Pickup was recorded for the reservation.\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_notifications_templates_update",
+      "parentId": "fld_notifications",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/notifications/templates/{{ _.template_id }}",
+      "name": "Update Template",
+      "description": "Requires SETTINGS_EDIT.",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"newSubject\": \"Updated notification subject\",\n  \"newBody\": \"Updated notification body.\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_notifications_rules_list",
+      "parentId": "fld_notifications",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/notifications/automation-rules",
+      "name": "List Automation Rules",
+      "description": "Requires SETTINGS_VIEW.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_notifications_rules_create",
+      "parentId": "fld_notifications",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/notifications/automation-rules",
+      "name": "Create Automation Rule",
+      "description": "Requires SETTINGS_EDIT. Copy the returned id into automation_rule_id.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Demo pickup notification\",\n  \"trigger\": \"PICKUP_RECORDED\",\n  \"templateId\": \"{{ _.template_id }}\",\n  \"delayMinutes\": 0\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_notifications_rules_toggle",
+      "parentId": "fld_notifications",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/notifications/automation-rules/{{ _.automation_rule_id }}/toggle",
+      "name": "Toggle Automation Rule",
+      "description": "Requires SETTINGS_EDIT.",
+      "method": "PATCH",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_reports_fleet_utilization",
+      "parentId": "fld_reports",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/reports/fleet-utilization?from={{ _.date_from }}&to={{ _.date_to }}",
+      "name": "Fleet Utilization Report",
+      "description": "Requires REPORT_VIEW.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_reports_revenue",
+      "parentId": "fld_reports",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/reports/revenue?from={{ _.date_from }}&to={{ _.date_to }}",
+      "name": "Revenue Report",
+      "description": "Requires REPORT_VIEW.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_reports_fleet_utilization_export",
+      "parentId": "fld_reports",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/reports/fleet-utilization/export?from={{ _.date_from }}&to={{ _.date_to }}&format=CSV",
+      "name": "Export Fleet Utilization",
+      "description": "format can be CSV or PDF. Requires REPORT_EXPORT.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_reports_revenue_export",
+      "parentId": "fld_reports",
+      "modified": 1777766400000,
+      "created": 1777766400000,
+      "url": "{{ _.base_url }}/api/v1/reports/revenue/export?from={{ _.date_from }}&to={{ _.date_to }}&format=CSV",
+      "name": "Export Revenue",
+      "description": "format can be CSV or PDF. Requires REPORT_EXPORT.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "_type": "request"
+    }
+  ]
+}

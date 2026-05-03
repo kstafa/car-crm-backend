@@ -6,7 +6,10 @@ import com.rentflow.shared.id.VehicleCategoryId;
 import com.rentflow.shared.id.VehicleId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -22,39 +25,58 @@ import java.util.stream.Collectors;
 public class RedisAvailabilityCacheAdapter implements AvailabilityCachePort {
 
     private static final Duration TTL = Duration.ofSeconds(30);
+    private static final Logger LOG = LoggerFactory.getLogger(RedisAvailabilityCacheAdapter.class);
 
     private final RedisTemplate<String, String> redisTemplate;
 
     @Override
     public Optional<List<VehicleId>> get(VehicleCategoryId categoryId, DateRange period) {
-        String raw = redisTemplate.opsForValue().get(buildKey(categoryId, period));
-        if (raw == null || raw.isBlank()) {
+        try {
+            String raw = redisTemplate.opsForValue().get(buildKey(categoryId, period));
+            if (raw == null || raw.isBlank()) {
+                return Optional.empty();
+            }
+            return Optional.of(Arrays.stream(raw.split(","))
+                    .filter(value -> !value.isBlank())
+                    .map(VehicleId::of)
+                    .toList());
+        } catch (DataAccessException ex) {
+            logCacheFailure("read", "continuing without cached availability", ex);
             return Optional.empty();
         }
-        return Optional.of(Arrays.stream(raw.split(","))
-                .filter(value -> !value.isBlank())
-                .map(VehicleId::of)
-                .toList());
     }
 
     @Override
     public void put(VehicleCategoryId categoryId, DateRange period, List<VehicleId> ids) {
-        String value = ids.stream()
-                .map(id -> id.value().toString())
-                .collect(Collectors.joining(","));
-        redisTemplate.opsForValue().set(buildKey(categoryId, period), value, TTL);
+        try {
+            String value = ids.stream()
+                    .map(id -> id.value().toString())
+                    .collect(Collectors.joining(","));
+            redisTemplate.opsForValue().set(buildKey(categoryId, period), value, TTL);
+        } catch (DataAccessException ex) {
+            logCacheFailure("write", "continuing without cached availability", ex);
+        }
     }
 
     @Override
     public void invalidate(VehicleId vehicleId) {
-        Set<String> keys = redisTemplate.keys("availability:*");
-        if (keys != null && !keys.isEmpty()) {
-            redisTemplate.delete(keys);
+        try {
+            Set<String> keys = redisTemplate.keys("availability:*");
+            if (keys != null && !keys.isEmpty()) {
+                redisTemplate.delete(keys);
+            }
+        } catch (DataAccessException ex) {
+            logCacheFailure("invalidation", "continuing for vehicle " + vehicleId.value(), ex);
         }
     }
 
     private static String buildKey(VehicleCategoryId categoryId, DateRange period) {
         return "availability:%s:%d:%d".formatted(categoryId.value(), period.start().toEpochSecond(),
                 period.end().toEpochSecond());
+    }
+
+    private static void logCacheFailure(String operation, String outcome, DataAccessException ex) {
+        LOG.warn("Availability cache {} failed; {}: {}", operation, outcome, ex.getMessage());
+        LOG.debug("Availability cache {} failure", operation, ex);
     }
 }
