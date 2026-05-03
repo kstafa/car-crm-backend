@@ -32,6 +32,12 @@ class CustomerJpaEntity {
     CustomerStatus status;
     @Column(columnDefinition = "text")
     String blacklistReason;
+    @Column(length = 50)
+    String drivingLicenseNumber;
+    java.time.LocalDate drivingLicenseExpiry;
+    @Column(length = 30)
+    String passportNumber;
+    java.time.LocalDate passportExpiry;
     @CreationTimestamp
     Instant createdAt;
     @UpdateTimestamp

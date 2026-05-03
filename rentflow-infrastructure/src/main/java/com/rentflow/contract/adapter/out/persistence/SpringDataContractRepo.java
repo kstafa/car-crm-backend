@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-interface SpringDataContractRepo extends JpaRepository<ContractJpaEntity, UUID> {
+public interface SpringDataContractRepo extends JpaRepository<ContractJpaEntity, UUID> {
     Optional<ContractJpaEntity> findByReservationId(UUID reservationId);
 
     @Query("""
@@ -20,6 +20,30 @@ interface SpringDataContractRepo extends JpaRepository<ContractJpaEntity, UUID> 
             ORDER BY c.scheduledReturn ASC
             """)
     List<ContractJpaEntity> findActive();
+
+    @Query("""
+            SELECT c FROM ContractJpaEntity c
+            WHERE c.status = com.rentflow.contract.ContractStatus.ACTIVE
+              AND c.scheduledReturn < :now
+            ORDER BY c.scheduledReturn ASC
+            """)
+    List<ContractJpaEntity> findOverdue(@Param("now") java.time.ZonedDateTime now);
+
+    long countByStatus(ContractStatus status);
+
+    @Query("""
+            SELECT new com.rentflow.report.model.VehicleUtilizationRaw(
+                c.vehicleId, v.licensePlate, v.brand, v.model, COUNT(c.id))
+            FROM ContractJpaEntity c
+            JOIN VehicleJpaEntity v ON v.id = c.vehicleId
+            WHERE c.status = com.rentflow.contract.ContractStatus.COMPLETED
+              AND c.actualPickupDatetime >= :from
+              AND c.actualReturnDatetime < :to
+            GROUP BY c.vehicleId, v.licensePlate, v.brand, v.model
+            """)
+    List<com.rentflow.report.model.VehicleUtilizationRaw> vehicleUtilization(
+            @Param("from") java.time.ZonedDateTime from,
+            @Param("to") java.time.ZonedDateTime to);
 
     @Query("""
             SELECT c FROM ContractJpaEntity c

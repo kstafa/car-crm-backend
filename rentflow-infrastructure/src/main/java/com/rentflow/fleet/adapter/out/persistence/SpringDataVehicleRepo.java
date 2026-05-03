@@ -10,8 +10,12 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.UUID;
 
-interface SpringDataVehicleRepo extends JpaRepository<VehicleJpaEntity, UUID> {
+public interface SpringDataVehicleRepo extends JpaRepository<VehicleJpaEntity, UUID> {
     List<VehicleJpaEntity> findByCategoryIdAndActiveTrue(UUID categoryId);
+
+    long countByStatusAndActiveTrue(VehicleStatus status);
+
+    long countByActiveTrue();
 
     @Query("""
             SELECT v FROM VehicleJpaEntity v

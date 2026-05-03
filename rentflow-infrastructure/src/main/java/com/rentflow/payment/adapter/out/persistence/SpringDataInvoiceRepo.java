@@ -7,12 +7,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-interface SpringDataInvoiceRepo extends JpaRepository<InvoiceJpaEntity, UUID> {
+public interface SpringDataInvoiceRepo extends JpaRepository<InvoiceJpaEntity, UUID> {
 
     Optional<InvoiceJpaEntity> findByContractId(UUID contractId);
 
@@ -43,4 +44,37 @@ interface SpringDataInvoiceRepo extends JpaRepository<InvoiceJpaEntity, UUID> {
             Pageable pageable);
 
     Page<InvoiceJpaEntity> findByCustomerId(UUID customerId, Pageable pageable);
+
+    @Query("""
+            SELECT SUM(i.paidAmount) FROM InvoiceJpaEntity i
+            WHERE i.issueDate BETWEEN :from AND :to
+              AND i.status IN (com.rentflow.payment.InvoiceStatus.PAID,
+                               com.rentflow.payment.InvoiceStatus.PARTIALLY_PAID)
+            """)
+    BigDecimal sumPaidAmountBetween(@Param("from") LocalDate from, @Param("to") LocalDate to);
+
+    @Query("""
+            SELECT new com.rentflow.dashboard.model.DailyRevenueRaw(i.issueDate, SUM(i.paidAmount))
+            FROM InvoiceJpaEntity i
+            WHERE i.issueDate BETWEEN :from AND :to
+              AND i.status IN (com.rentflow.payment.InvoiceStatus.PAID,
+                               com.rentflow.payment.InvoiceStatus.PARTIALLY_PAID)
+            GROUP BY i.issueDate
+            ORDER BY i.issueDate
+            """)
+    List<com.rentflow.dashboard.model.DailyRevenueRaw> dailyRevenue(
+            @Param("from") LocalDate from, @Param("to") LocalDate to);
+
+    @Query("""
+            SELECT new com.rentflow.report.model.MonthlyRevenueRaw(
+                FUNCTION('DATE_TRUNC', 'month', i.issueDate), SUM(i.paidAmount), COUNT(i.id))
+            FROM InvoiceJpaEntity i
+            WHERE i.issueDate BETWEEN :from AND :to
+              AND i.status IN (com.rentflow.payment.InvoiceStatus.PAID,
+                               com.rentflow.payment.InvoiceStatus.PARTIALLY_PAID)
+            GROUP BY FUNCTION('DATE_TRUNC', 'month', i.issueDate)
+            ORDER BY FUNCTION('DATE_TRUNC', 'month', i.issueDate)
+            """)
+    List<com.rentflow.report.model.MonthlyRevenueRaw> monthlyRevenue(
+            @Param("from") LocalDate from, @Param("to") LocalDate to);
 }

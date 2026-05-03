@@ -1,6 +1,7 @@
 package com.rentflow.customer.adapter.out.persistence;
 
 import com.rentflow.customer.Customer;
+import com.rentflow.customer.model.DocumentComplianceSummary;
 import com.rentflow.customer.model.CustomerSummary;
 import com.rentflow.customer.port.out.CustomerRepository;
 import com.rentflow.customer.query.ListCustomersQuery;
@@ -12,6 +13,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @Primary
@@ -46,7 +51,37 @@ public class JpaCustomerRepository implements CustomerRepository {
         return repo.findFiltered(q.status(), blankToNull(q.searchTerm()), pageable).map(mapper::toSummary);
     }
 
+    @Override
+    public List<DocumentComplianceSummary> findExpiringDocuments(int withinDays) {
+        LocalDate today = LocalDate.now();
+        LocalDate limit = today.plusDays(withinDays);
+        List<DocumentComplianceSummary> summaries = new ArrayList<>();
+        for (CustomerJpaEntity customer : repo.findWithExpiringDocuments(today, limit)) {
+            if (customer.drivingLicenseExpiry != null
+                    && !customer.drivingLicenseExpiry.isBefore(today)
+                    && !customer.drivingLicenseExpiry.isAfter(limit)) {
+                summaries.add(toDocumentSummary(customer, "DRIVING_LICENSE", customer.drivingLicenseExpiry, today));
+            }
+            if (customer.passportExpiry != null
+                    && !customer.passportExpiry.isBefore(today)
+                    && !customer.passportExpiry.isAfter(limit)) {
+                summaries.add(toDocumentSummary(customer, "PASSPORT", customer.passportExpiry, today));
+            }
+        }
+        return summaries;
+    }
+
     private static String blankToNull(String value) {
         return value == null || value.isBlank() ? null : value;
+    }
+
+    private static DocumentComplianceSummary toDocumentSummary(CustomerJpaEntity customer, String type,
+                                                               LocalDate expiryDate, LocalDate today) {
+        return new DocumentComplianceSummary(CustomerId.of(customer.id),
+                customer.firstName + " " + customer.lastName,
+                customer.email,
+                type,
+                expiryDate,
+                ChronoUnit.DAYS.between(today, expiryDate));
     }
 }

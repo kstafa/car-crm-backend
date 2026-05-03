@@ -20,4 +20,6 @@ public interface ContractRepository {
     Page<ContractSummary> findAll(ListContractsQuery query);
 
     List<ContractSummary> findActive();
+
+    List<ContractSummary> findOverdue();
 }

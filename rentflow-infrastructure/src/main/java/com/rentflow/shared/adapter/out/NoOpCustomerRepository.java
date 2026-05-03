@@ -1,6 +1,7 @@
 package com.rentflow.shared.adapter.out;
 
 import com.rentflow.customer.Customer;
+import com.rentflow.customer.model.DocumentComplianceSummary;
 import com.rentflow.customer.model.CustomerSummary;
 import com.rentflow.customer.port.out.CustomerRepository;
 import com.rentflow.customer.query.ListCustomersQuery;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.Optional;
+import java.util.List;
 
 public class NoOpCustomerRepository implements CustomerRepository {
     @Override
@@ -30,5 +32,10 @@ public class NoOpCustomerRepository implements CustomerRepository {
         int page = query == null ? 0 : Math.max(query.page(), 0);
         int size = query == null ? 20 : Math.max(query.size(), 1);
         return Page.empty(PageRequest.of(page, size));
+    }
+
+    @Override
+    public List<DocumentComplianceSummary> findExpiringDocuments(int withinDays) {
+        return List.of();
     }
 }

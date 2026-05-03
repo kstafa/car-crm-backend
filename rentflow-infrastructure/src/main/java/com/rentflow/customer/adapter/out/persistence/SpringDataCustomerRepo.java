@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.UUID;
 
-interface SpringDataCustomerRepo extends JpaRepository<CustomerJpaEntity, UUID> {
+public interface SpringDataCustomerRepo extends JpaRepository<CustomerJpaEntity, UUID> {
     boolean existsByEmail(String email);
 
     @Query("""
@@ -24,4 +24,15 @@ interface SpringDataCustomerRepo extends JpaRepository<CustomerJpaEntity, UUID> 
             @Param("status") CustomerStatus status,
             @Param("search") String search,
             Pageable pageable);
+
+    @Query("""
+            SELECT c FROM CustomerJpaEntity c
+            WHERE (c.drivingLicenseExpiry IS NOT NULL
+                   AND c.drivingLicenseExpiry BETWEEN :today AND :limit)
+               OR (c.passportExpiry IS NOT NULL
+                   AND c.passportExpiry BETWEEN :today AND :limit)
+            """)
+    java.util.List<CustomerJpaEntity> findWithExpiringDocuments(
+            @Param("today") java.time.LocalDate today,
+            @Param("limit") java.time.LocalDate limit);
 }

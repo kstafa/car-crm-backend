@@ -17,6 +17,7 @@ import com.rentflow.contract.model.ContractDetail;
 import com.rentflow.payment.LineItem;
 import com.rentflow.payment.Payment;
 import com.rentflow.payment.model.InvoiceDetail;
+import com.rentflow.report.model.ReportData;
 import com.rentflow.shared.InfrastructureException;
 import com.rentflow.shared.money.Money;
 import com.rentflow.shared.port.out.PdfGeneratorPort;
@@ -63,6 +64,20 @@ public class OpenPdfInvoiceGenerator implements PdfGeneratorPort {
             return baos.toByteArray();
         } catch (Exception e) {
             throw new InfrastructureException("Failed to generate contract PDF", e);
+        }
+    }
+
+    @Override
+    public byte[] generateReport(ReportData data) {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            Document doc = new Document();
+            PdfWriter.getInstance(doc, baos);
+            doc.open();
+            doc.add(new Paragraph("Report: " + data.reportType()));
+            doc.close();
+            return baos.toByteArray();
+        } catch (Exception e) {
+            throw new InfrastructureException("Failed to generate report PDF", e);
         }
     }
 

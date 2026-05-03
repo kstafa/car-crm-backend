@@ -57,4 +57,9 @@ public class JpaContractRepository implements ContractRepository {
     public List<ContractSummary> findActive() {
         return repo.findActive().stream().map(mapper::toSummary).toList();
     }
+
+    @Override
+    public List<ContractSummary> findOverdue() {
+        return repo.findOverdue(java.time.ZonedDateTime.now()).stream().map(mapper::toSummary).toList();
+    }
 }

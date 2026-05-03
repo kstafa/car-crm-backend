@@ -24,6 +24,9 @@ rentflow:
     enabled: false
     bucket: rentflow-assets
     base-url: ""
+  email:
+    enabled: false
+    from: noreply@rentflow.com
 
 server:
   port: 8080
